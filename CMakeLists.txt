@@ -5,10 +5,10 @@ project (tvirt)
 
 
 add_executable(tvirtd
-daemon/main.cpp
-daemon/libvirt/Virt.cpp
-daemon/libvirt/Virt.hpp
-daemon/libvirt/Vm.hpp
+./daemon/main.cpp
+./daemon/libvirt/Virt.cpp
+./daemon/libvirt/Virt.hpp
+./daemon/libvirt/Vm.hpp
 )
 
 target_link_libraries (tvirtd -lvirt -ldl)
