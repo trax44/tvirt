@@ -19,8 +19,23 @@ public:
   Vm (ID id, const std::string &name): 
     id   (id), 
     name (name){}
+  
+
+  const std::string &getName()const{
+    return name;
+  }
 
 };
 
 
 #endif /* TVIRT_DAEMON */
+
+
+
+
+
+
+
+
+
+

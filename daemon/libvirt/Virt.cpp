@@ -18,78 +18,57 @@ Virt::Virt() :
 }
 
 
-Return<Virt::List> getListInactiveVm() {
+Return<Virt::List> Virt::getListInactiveVm() {
+  Virt::List inactiveVms;
+  return getListInactiveVm(inactiveVms);
+}
+
+Return<Virt::List> Virt::getListInactiveVm(Virt::List &inactiveVms) {
   char *names[32];
   int r;
-  if ((r = virConnectListDefinedDomains (conn, &names, sizeof(ids)>>2)) < 1){
+  if ((r = virConnectListDefinedDomains (conn, &names[0], 32)) < 1){
     return false;
   }
 
-  List inactiveVms;
-
-
   while (r--) {
-    inactiveVms.push_back(Vm(r, names[r]))xs;
+    inactiveVms.push_back(Vm(r, names[r]));
   }
 
-  return inactiveVms;
+  return Return<Virt::List>(inactiveVms);
 }
 
 
-Virt::List Virt::getListActiveVm(){
+Return<Virt::List> Virt::getListActiveVm() {
+  Virt::List inactiveVms;
+  return getListActiveVm(inactiveVms);
+}
+
+Return<Virt::List> Virt::getListActiveVm(Virt::List &inactiveVms) {
   int ids [32];
+  int r;
 
-  virConnectListDomains (conn, ids, sizeof(ids)>>2);
   
+  if ((r = virConnectListDomains (conn, ids, 32)) < 1){
+    return false;
+  }
+  
+
+  while (r--) {
+    virDomainPtr virDomain = virDomainLookupByID(conn, ids[r]);
+    inactiveVms.push_back(Vm(ids[r], virDomainGetName(virDomain)));
+  }
+
+  return Return<Virt::List>(inactiveVms);
 }
 
-Virt::List Virt::getListAllVm() {
-  
+Return<Virt::List> Virt::getListAllVm() {
+  List allVms;
+  getListInactiveVm(allVms);
+  getListActiveVm(allVms);
+
+  return allVms;
 }
     
 } //daemon
   
 } //tvirt
-
-static void getDomainInfo(int id) {
-  virConnectPtr conn = NULL; /* the hypervisor connection */
-  virDomainPtr dom = NULL;   /* the domain being checked */
-  virDomainInfo info;        /* the information being fetched */
-  int ret;
-
-  /* NULL means connect to local Xen hypervisor */
-  conn = virConnectOpenReadOnly(NULL);
-  if (conn == NULL) {
-    fprintf(stderr, "Failed to connect to hypervisor\n");
-    goto error;
-  }
-
-  /* Find the domain of the given id */
-  dom = virDomainLookupByID(conn, id);
-  if (dom == NULL) {
-    fprintf(stderr, "Failed to find Domain %d\n", id);
-    goto error;
-  }
-
-  /* Get the information */
-  ret = virDomainGetInfo(dom, &info);
-  if (ret < 0) {
-    fprintf(stderr, "Failed to get information for Domain %d\n", id);
-    goto error;
-  }
-
-  printf("Domains %d: %d CPUs\n", id, info.nrVirtCpu);
-
- error:
-  if (dom != NULL)
-    virDomainFree(dom);
-  if (conn != NULL)
-    virConnectClose(conn);
-}
-
-int main() {
-
-  getDomainInfo(0);
-
-  return(0);
-}

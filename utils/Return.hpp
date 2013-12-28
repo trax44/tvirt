@@ -20,6 +20,11 @@ public:
     success(_success) {
   }
 
+  Return (T _data): 
+    data(_data),
+    success(true) {
+  }
+
   template<typename CurrentType>
   Return (const Return <CurrentType> &r){
     data     = r.data;
@@ -29,12 +34,6 @@ public:
   template<typename CurrentType>
   Return (Return <CurrentType> &r){
     data     = r.data;
-    success  = r.success;
-  }
-
-  template<typename CurrentType>
-  Return (Return <CurrentType> &&r){
-    data     = std::move (r.data);
     success  = r.success;
   }
 
