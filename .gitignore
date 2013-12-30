@@ -6,3 +6,5 @@ cmake_install.cmake
 tvirtd
 *.pb.cc
 *.pb.h
+*.a
+*.o
