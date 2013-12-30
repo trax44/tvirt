@@ -7,6 +7,5 @@ libvirt/Virt.hpp
 libvirt/Vm.hpp
 )
 
-pkg_check_modules (VIRT required libvirt)
-
+pkg_check_modules (VIRT libvirt)
 target_link_libraries (tvirtd ${VIRT_LIBRARIES} comm)
