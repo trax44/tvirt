@@ -10,15 +10,14 @@
 namespace tvirt {
 namespace daemon {
     
-    
 class Virt {
 public:
   typedef std::list<Vm> List;
 
 private:
   virConnectPtr conn; 
-  Return<List> getListInactiveVm(List&);
-  Return<List> getListActiveVm(List&);
+  Return<void> getListInactiveVm(List&);
+  Return<void> getListActiveVm(List&);
 
 public:
   Virt();
