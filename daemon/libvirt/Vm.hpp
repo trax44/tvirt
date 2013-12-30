@@ -11,8 +11,8 @@ public:
   
 
 private:
-  const std::string name;
   const ID id;
+  const std::string name;
 
 public:
 
