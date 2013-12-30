@@ -12,3 +12,5 @@ add_executable(tvirtd
 )
 
 target_link_libraries (tvirtd -lvirt -ldl)
+
+add_subdirectory (proto)
