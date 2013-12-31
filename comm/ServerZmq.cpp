@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "ServerZmq.hpp"
 
 
@@ -12,7 +13,7 @@ ServerZmq::ServerZmq(const std::string &address,
   
   if ((context = zmq_init(1)) == NULL) {
     throw std::runtime_error ("Failed to init zmq with 1 thread ("
-                              + zmq_strerror(zmq_errno()) +")");
+                              + std::string(zmq_strerror(zmq_errno())) +")");
   }
   
   Return<std::string> res = bind();
@@ -28,7 +29,7 @@ Return<std::string> ServerZmq::bind() {
   }
 
 
-  if ((socket = zmq_bind (socket, context)) == NULL){
+  if (zmq_bind (socket, address.c_str()) != 0){
     return Return<std::string>(false, zmq_strerror(zmq_errno()));
   } else {
     return true;

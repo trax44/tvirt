@@ -15,7 +15,7 @@ public:
     success(_success) {
   }
   
-  Return (T _data, bool _success): 
+  Return (bool _success, T _data): 
     data(_data),
     success(_success) {
   }

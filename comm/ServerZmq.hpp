@@ -1,10 +1,9 @@
 
-
 #ifndef TVIRT_COMM_SERVERZMQ_HPP_
 #define TVIRT_COMM_SERVERZMQ_HPP_
 
 #include <zmq.h>
-
+#include "Server.hpp"
 
 
 namespace tvirt {
@@ -13,7 +12,7 @@ namespace comm {
 
 
 class ServerZmq : public Server {
-private:
+protected:
   void *context;
   void *socket;
 

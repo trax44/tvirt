@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "ClientZmq.hpp"
 
 
@@ -10,7 +12,7 @@ ClientZmq::ClientZmq(const std::string &address,
   Client(address, port){
   if ((context = zmq_init(1)) == NULL) {
     throw std::runtime_error ("Failed to init zmq with 1 thread ("
-                              + zmq_strerror(zmq_errno()) +")");
+                              + std::string(zmq_strerror(zmq_errno())) +")");
   }
 
 
@@ -20,12 +22,12 @@ ClientZmq::ClientZmq(const std::string &address,
   }
 }
 
-Return<std::string> connect() {
+Return<std::string> ClientZmq::connect() {
   if (socket == NULL){
     return Return<std::string> (false, "Socket not initialized");
   }
   
-  if ((socket = zmq_connect (socket, context)) == NULL){
+  if (zmq_connect (socket, address.c_str()) != 0){
     return Return<std::string>(false, zmq_strerror(zmq_errno()));
   } else {
     return true;

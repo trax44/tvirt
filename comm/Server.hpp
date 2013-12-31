@@ -1,5 +1,5 @@
-#ifndef TVIRT_COMM_COMM_HPP_
-#define TVIRT_COMM_COMM_HPP_
+#ifndef TVIRT_COMM_SERVER_HPP_
+#define TVIRT_COMM_SERVER_HPP_
 
 
 #include <string>
@@ -15,7 +15,7 @@ namespace comm {
 
 
 class Server {
-private:
+protected:
   std::string address;
   uint16_t port;
   virtual Return<std::string> bind() = 0;

@@ -1,5 +1,5 @@
-#ifndef TVIRT_COMM_COMM_HPP_
-#define TVIRT_COMM_COMM_HPP_
+#ifndef TVIRT_COMM_CLIENT_HPP_
+#define TVIRT_COMM_CLIENT_HPP_
 
 
 #include <string>
@@ -16,7 +16,7 @@ namespace comm {
 
 
 class Client {
-private:
+protected:
   std::string address;
   uint16_t port;
   virtual Return<std::string> connect() = 0;

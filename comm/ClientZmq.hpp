@@ -10,7 +10,10 @@ namespace comm {
 
 class ClientZmq: public Client {
 private:
-  Return<std::string> connec();
+  void *context;
+  void *socket;
+
+  Return<std::string> connect();
 
 public:
   ClientZmq(const std::string &address, const uint16_t port);
