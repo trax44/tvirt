@@ -8,4 +8,4 @@ libvirt/Vm.hpp
 )
 
 pkg_check_modules (VIRT libvirt)
-target_link_libraries (tvirtd ${VIRT_LIBRARIES} comm)
+target_link_libraries (tvirtd ${VIRT_LIBRARIES} commZmq proto)
