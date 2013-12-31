@@ -1,42 +1,48 @@
 package tvirt;
 
 message Address {
-        required string address = 1;
+  required string address = 1;
 }
 
 
 message Host {
-        enum OS{
-             GENTOO = 0;
-             DEBIAN = 1;
-             CENTOS = 2;
-             FEDORA = 3;
-             UBUNTU = 4;
-             ARCH   = 5;
-             LINUX  = 6;
-             BDS    = 7;
-             OTHER  = 8;
-             WIND   = 9;
-        }
+  enum OS{
+    GENTOO = 0;
+    DEBIAN = 1;
+    CENTOS = 2;
+    FEDORA = 3;
+    UBUNTU = 4;
+    ARCH   = 5;
+    LINUX  = 6;
+    BDS    = 7;
+    OTHER  = 8;
+    WIND   = 9;
+  }
 
-        required OS os            = 1;
-        required Address address  = 2;
-        required string name      = 3;
-        optional int32 nbCPU      = 4;
-        optional int64 memory     = 5;
+  required string name      = 1;
+  optional Address address  = 2;
+  optional OS os            = 3;
+  optional int32 nbCPU      = 4;
+  optional int64 memory     = 5;
 }
 
+
+message Guest {
+  required Host host = 1;
+  required int64 id = 2;
+}
 message Hypervisor {
-        enum Type {
-             KVM = 0;
-             XEN = 1;
-             LXC = 2;
-             HYPER_V = 3;
-        }
+  enum Type {
+    KVM     = 0;
+    XEN     = 1;
+    LXC     = 2;
+    HYPER_V = 3;
+    UNKNOWN = 4;
+  }
 
 
-        required Type type    = 1;
-        required Host host    = 2;  
+  required Type type    = 1;
+  required Host host    = 2;  
 
-        repeated Host guests  = 3;
+  repeated Guest guests  = 3;
 }

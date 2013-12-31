@@ -6,24 +6,34 @@
 
 #include "../../utils/Return.hpp"
 #include "Vm.hpp"
+#include "../../proto/Hypervisor.pb.h"
+
+
 
 namespace tvirt {
 namespace daemon {
     
 class Virt {
 public:
-  typedef std::list<Vm> List;
+  typedef tvirt::Hypervisor List;
 
 private:
   virConnectPtr conn; 
-  Return<void> getListInactiveVm(List&);
-  Return<void> getListActiveVm(List&);
+
+  tvirt::Hypervisor hypervisor;
+
+  Return<void> getListInactiveVm(Hypervisor &);
+  Return<void> getListActiveVm(Hypervisor &);
 
 public:
   Virt();
-  Return<List> getListInactiveVm();
-  Return<List> getListActiveVm();
-  Return<List> getListAllVm();
+  // Return<List> getListInactiveVm();
+  // Return<List> getListActiveVm();
+  // Return<List> getListAllVm();
+
+  const tvirt::Hypervisor & getHypervisor();
+
+
 };
 
     
