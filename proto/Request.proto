@@ -5,6 +5,7 @@ message Request{
     DOMAIN_DESTROY = 0;
     DOMAIN_REBOOT  = 1;
     DOMAIN_START   = 2;
+    DOMAIN_LIST    = 3;
   }
 
   required Type   type       = 1;

@@ -2,9 +2,10 @@ find_package(PkgConfig)
 
 add_executable(tvirtd
 main.cpp
+Daemon.cpp
+Daemon.hpp
 libvirt/Virt.cpp
 libvirt/Virt.hpp
-libvirt/Vm.hpp
 )
 
 pkg_check_modules (VIRT libvirt)

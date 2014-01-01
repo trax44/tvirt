@@ -32,7 +32,7 @@ public:
   // Return<List> getListActiveVm();
   // Return<List> getListAllVm();
 
-  const tvirt::Hypervisor & getHypervisor();
+  const Hypervisor & getHypervisor();
   const Return<void> rebootDomain (const DomainID id);
 
 };
