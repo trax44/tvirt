@@ -3,7 +3,50 @@
 #include "libvirt/Virt.hpp"
 
 #include "../comm/ClientZmq.hpp"
+#include "../proto/Request.pb.h"
 
+
+namespace tvirt {
+
+void handlerRequest(const std::string &address, 
+                    const uint16_t port){
+  bool ok = true;
+
+  
+  comm::ClientZmq requester(address, port, ZMQ_REP);
+  
+  Return<std::string> ret(false);
+  Request request;
+  while (ok) {
+    ret.data.clear();
+    requester.recv(&ret);
+    
+    if (!ret.success){
+      std::cerr << "Fail to receive message" << std::endl;
+      continue;
+    }
+
+    if (!request.ParseFromString(ret.data)) {
+      std::cerr << "Fail during parsing" << std::endl;
+    }
+    
+    switch(request.type()){
+    case Request::DOMAIN_DESTROY:
+      
+      break;
+    case Request::DOMAIN_REBOOT:
+      break;
+    case Request::DOMAIN_START:
+      break;
+    default:
+      std::cerr << "Unknow command " << request.type() << std::endl;
+    }
+    
+  }
+}
+
+
+} //tvirt
 
 int main(int argc, char *argv[]) {
   //\TODO use boost::program_options or better
