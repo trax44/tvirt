@@ -77,7 +77,36 @@ const tvirt::Hypervisor & Virt::getHypervisor() {
   return hypervisor;
 }
 
+const Return<void> Virt::rebootDomain (const DomainID id) {
+  virDomainPtr domainPtr;
+
+  if ((domainPtr = virDomainLookupByID (conn, id)) == NULL){
+    return false;
+  }
+  
+  if (virDomainReboot(domainPtr, VIR_DOMAIN_REBOOT_DEFAULT) == 0){
+    return true;
+  } else {
+    return false;
+  }
+  
+}
+
     
 } //daemon
   
 } //tvirt
+
+
+
+
+
+
+
+
+
+
+
+
+
+

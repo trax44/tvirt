@@ -15,9 +15,10 @@ namespace daemon {
     
 class Virt {
 public:
-  typedef tvirt::Hypervisor List;
+  typedef int DomainID;
 
 private:
+  
   virConnectPtr conn; 
 
   tvirt::Hypervisor hypervisor;
@@ -32,7 +33,7 @@ public:
   // Return<List> getListAllVm();
 
   const tvirt::Hypervisor & getHypervisor();
-
+  const Return<void> rebootDomain (const DomainID id);
 
 };
 
