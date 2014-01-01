@@ -17,6 +17,10 @@ int main(int argc, char *argv[]) {
   const tvirt::Hypervisor &hypervisor = virt.getHypervisor();
   
 
+  std::string serializedAnswer;
+  hypervisor.SerializeToString(&serializedAnswer);
+  sender.send(serializedAnswer);
+
   std::cout << "type      " << hypervisor.type()        << std::endl;
   std::cout << "host name " << hypervisor.host().name() << std::endl;
   
