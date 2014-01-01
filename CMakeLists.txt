@@ -3,5 +3,8 @@ project (tvirt)
 
 
 add_subdirectory (proto)
-add_subdirectory (daemon)
 add_subdirectory (comm)
+
+
+add_subdirectory (daemon)
+add_subdirectory (master)

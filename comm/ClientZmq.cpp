@@ -33,7 +33,7 @@ Return<std::string> ClientZmq::connect() {
     return Return<std::string> (false, "Socket not initialized");
   }
   
-  if (zmq_connect (socket, address.c_str()) != 0){
+  if (zmq_connect (socket, endPoint.c_str()) != 0){
     return Return<std::string>(false, zmq_strerror(zmq_errno()));
   } else {
     return true;

@@ -14,6 +14,7 @@ class Zmq :public Comm{
 protected:
   void *context;
   void *socket;
+  std::string endPoint;
   int type;
 public:
   Zmq (const std::string &address, 

@@ -22,6 +22,8 @@ public:
             const uint16_t port, 
             const int type);
 
+  Return<void> setFilter(const void *option_value, size_t option_len);
+
 };
 
 

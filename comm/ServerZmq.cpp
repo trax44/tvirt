@@ -33,14 +33,23 @@ Return<std::string> ServerZmq::bind() {
     return Return<std::string> (false, "Socket not initialized");
   }
 
-
-  if (zmq_bind (socket, address.c_str()) != 0){
+  
+  if (zmq_bind (socket, endPoint.c_str()) != 0){
     return Return<std::string>(false, zmq_strerror(zmq_errno()));
   } else {
     return true;
   }
 }
 
+
+Return<void> ServerZmq::setFilter(const void *option_value, size_t option_len) {
+  if (zmq_setsockopt (socket, ZMQ_SUBSCRIBE, option_value, option_len) != 0){
+    std::cerr << "Fail to subscribe" << std::endl;
+    return false;
+  } else {
+    return true;
+  }
+}
 
 } //comm
 
