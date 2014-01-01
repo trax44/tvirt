@@ -2,31 +2,16 @@
 #include "libvirt/Virt.hpp"
 
 #include "../comm/ClientZmq.hpp"
-#include "../comm/ServerZmq.hpp"
-
-
-
 
 
 int main(int argc, char *argv[]) {
-
-  bool modeSync = true;
-
-
   //\TODO use boost::program_options or better
 
-  if (argc == 2) {
-    if (strcmp(argv[1], "--async") == 0){
-      modeSync = false;
-    } else {
-      return -1;
-    }
-  } else {
+  if (argc != 3) {
     return -1;
   }
 
-
-  
+  tvirt::comm::ClientZmq sender(argv[1], atoi(argv[2]), ZMQ_PUSH);
 
   tvirt::daemon::Virt virt;
   const tvirt::Hypervisor &hypervisor = virt.getHypervisor();

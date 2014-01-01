@@ -24,9 +24,9 @@ Return<std::string> Zmq::init(const int type){
 Return<int> Zmq::send(const std::string &message) {
   int n;
   if ((n = zmq_send(socket, message.data(), message.size(), 0)) > 0){
-    retur false;
+    return false;
   } else {
-    return Return(true, n);
+    return Return<int>(true, n);
   }
 }
 
@@ -47,7 +47,7 @@ int Zmq::recv(Return<std::string> *ret) {
     return 0;
   }
 
-  ret->data.append(zmq_msg_data (&part), 
+  ret->data.append(static_cast<char*>(zmq_msg_data (&part)), 
                    zmq_msg_size(&part));
   
   zmq_msg_close (&part); 

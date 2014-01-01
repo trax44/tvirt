@@ -7,12 +7,11 @@ pkg_check_modules (ZMQ libzmq)
 
 
 add_library(commZmq
-Client.cpp
-Client.hpp
+Comm.hpp
+Zmq.cpp
+Zmq.hpp
 ClientZmq.cpp
 ClientZmq.hpp
-Server.cpp
-Server.hpp
 ServerZmq.cpp
 ServerZmq.hpp
 )

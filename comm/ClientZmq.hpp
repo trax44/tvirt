@@ -1,7 +1,6 @@
 #ifndef TVIRT_COMM_CLIENTZMQ_HPP_
 #define TVIRT_COMM_CLIENTZMQ_HPP_
 
-#include "Client.hpp"
 #include "Zmq.hpp"
 
 
@@ -9,10 +8,8 @@ namespace tvirt {
 
 namespace comm {
 
-class ClientZmq: public Client, public Zmq{
+class ClientZmq: public Zmq{
 private:
-  void *context;
-  void *socket;
 
   Return<std::string> connect();
 

@@ -10,7 +10,7 @@ namespace comm {
 ServerZmq::ServerZmq(const std::string &address, 
                      const uint16_t port,
                      const int type) :
-  Server::Server(address, port){
+  Zmq::Zmq(address, port, type){
   
   {
     Return<std::string> res = init(type);

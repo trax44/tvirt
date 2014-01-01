@@ -10,7 +10,7 @@ namespace comm {
 ClientZmq::ClientZmq(const std::string &address, 
                      const uint16_t port,
                      const int type):
-  Client(address, port){
+  Zmq::Zmq(address, port, type){
 
 
   {
