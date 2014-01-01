@@ -11,19 +11,20 @@ ClientZmq::ClientZmq(const std::string &address,
                      const uint16_t port,
                      const int type):
   Client(address, port){
-  if ((context = zmq_init(1)) == NULL) {
-    throw std::runtime_error ("Failed to init zmq with 1 thread ("
-                              + std::string(zmq_strerror(zmq_errno())) +")");
+
+
+  {
+    Return<std::string> res = init(type);
+    if (!res.success) {
+      throw std::runtime_error(res.data);
+    }
   }
 
-  if ((socket = zmq_socket(context, type)) == NULL){
-    throw std::runtime_error ("Failed to to create socket ("
-                              + std::string(zmq_strerror(zmq_errno())) +")");
-  }
-
-  Return<std::string> res = connect();
-  if (!res.success) {
-    throw std::runtime_error (res.data);
+  {
+    Return<std::string> res = connect();
+    if (!res.success) {
+      throw std::runtime_error (res.data);
+    }
   }
 }
 
@@ -38,6 +39,7 @@ Return<std::string> ClientZmq::connect() {
     return true;
   }
 }
+
 
 } //comm
 

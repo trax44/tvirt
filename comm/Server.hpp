@@ -5,16 +5,14 @@
 #include <string>
 #include <stdint.h>
 #include "../utils/Return.hpp" 
-
-
+#include "Comm.hpp"
 
 
 namespace tvirt {
 
 namespace comm {
 
-
-class Server {
+class Server :public Comm {
 protected:
   std::string address;
   uint16_t port;

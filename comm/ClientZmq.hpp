@@ -2,13 +2,14 @@
 #define TVIRT_COMM_CLIENTZMQ_HPP_
 
 #include "Client.hpp"
-#include "../utils/Return.hpp"
+#include "Zmq.hpp"
+
 
 namespace tvirt {
 
 namespace comm {
 
-class ClientZmq: public Client {
+class ClientZmq: public Client, public Zmq{
 private:
   void *context;
   void *socket;

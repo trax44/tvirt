@@ -6,6 +6,7 @@
 #include <zmq.h>
 #include <stdint.h>
 #include "../utils/Return.hpp" 
+#include "Comm.hpp"
 
 
 
@@ -15,7 +16,7 @@ namespace tvirt {
 namespace comm {
 
 
-class Client {
+class Client :public Comm {
 protected:
   std::string address;
   uint16_t port;
@@ -24,7 +25,6 @@ protected:
 public:
   Client(const std::string &address, 
          const uint16_t port);
-  
 
   virtual ~Client();
 };
