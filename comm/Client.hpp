@@ -22,7 +22,9 @@ protected:
   virtual Return<std::string> connect() = 0;
 
 public:
-  Client(const std::string &address, const uint16_t port);
+  Client(const std::string &address, 
+         const uint16_t port);
+  
 
   virtual ~Client();
 };
