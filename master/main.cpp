@@ -2,7 +2,9 @@
 
 #include <stdlib.h>
 
-#include "../comm/ServerZmq.hpp"
+#include "../comm/ClientZmq.hpp"
+#include "../proto/Request.pb.h"
+
 #include "../proto/Hypervisor.pb.h"
 
 
@@ -16,17 +18,22 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  tvirt::comm::ServerZmq receiver(argv[1], atoi(argv[2]), ZMQ_SUB);
-  receiver.setFilter("", 0);
+  tvirt::comm::ClientZmq requester(argv[1], atoi(argv[2]), ZMQ_REQ);
+
+  tvirt::Request req;
+  req.set_type(tvirt::Request::DOMAIN_LIST);
+
+  std::string request;
+  req.SerializeToString(&request);
+  requester.send(request);
 
   Return<std::string> ret(false);
-  int n = receiver.recv(&ret);
+  int n = requester.recv(&ret);
 
   if (!ret.success){
     std::cerr << "receive failed " << ret.data << std::endl;
     return -1;
   } 
-
 
   tvirt::Hypervisor hypervisor;
   if (!hypervisor.ParseFromString(ret.data)){

@@ -8,15 +8,15 @@
 int main(int argc, char *argv[]) {
   //\TODO use boost::program_options or better
 
-  if (argc != 3) {
+  if (argc != 4) {
     std::cout << "Usage: " 
               << argv[0] 
-              << "address port (e.g. tcp://localhost 5555)"
+              << "address portPublisher portRequest (e.g. tcp://* 5555 5556)"
               << std::endl;
     return -1;
   }
 
-  tvirt::daemon::Daemon daemon(argv [1], atoi(argv[2]));
+  tvirt::daemon::Daemon daemon(argv [1], atoi(argv[2]), atoi(argv[3]));
   
   // const tvirt::Hypervisor &hypervisor = virt.getHypervisor();
   

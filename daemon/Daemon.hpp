@@ -15,18 +15,20 @@ namespace daemon {
 class Daemon {
 private:
   const std::string address;
-  const uint16_t port;
+  const uint16_t portPublisher;
+  const uint16_t portRequest;
   tvirt::daemon::Virt virt;
   tvirt::comm::ServerZmq publisher;  
   tvirt::comm::ServerZmq replyer;  
 
-  Return<void> execute(const Request::Type command,
+  Return<void> execute(const Request &request,
                        std::string *ret);
 public:
-  Daemon(const std::string &address, const uint16_t port);
+  Daemon(const std::string &address, 
+         const uint16_t portPublisher,
+         const uint16_t portRequest);
 
-  void handlerRequest(const std::string &address, 
-                      const uint16_t port);
+  void handlerRequest();
 
 };
 

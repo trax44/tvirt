@@ -6,22 +6,26 @@ namespace daemon {
 
 
 Daemon::Daemon(const std::string &address,
-               const uint16_t port):
+               const uint16_t portPublisher,
+               const uint16_t portRequest):
+
   address(address),
-  port(port),
-  publisher(address, port, ZMQ_PUB),
-  replyer(address, port, ZMQ_REP){
+  portPublisher(portPublisher),
+  portRequest(portRequest),
+  publisher(address, portPublisher, ZMQ_PUB),
+  replyer(address, portRequest, ZMQ_REP){
 
-
+  handlerRequest();
 }
 
 
-Return<void> Daemon::execute(const Request::Type command,
+Return<void> Daemon::execute(const Request & request,
                              std::string *serializedAnswer){
   // \TODO: avoid copy of hypervisor (getHypervisor return reference)
   
-    switch(command){
+    switch(request.type()){
     case Request::DOMAIN_DESTROY:
+      
       break;
 
     case Request::DOMAIN_REBOOT:
@@ -38,16 +42,15 @@ Return<void> Daemon::execute(const Request::Type command,
       break;
 
     default:
-      std::cerr << "Unknow command " << command << std::endl;
+      std::cerr << "Unknow command " << request.type() << std::endl;
       return false;
     }
     return true;
 }
 
-void Daemon::handlerRequest(const std::string &address, 
-                            const uint16_t port){
+void Daemon::handlerRequest(){
   
-bool ok = true;
+  bool ok = true;
   std::string serializedAnswer;
 
   
@@ -68,7 +71,7 @@ bool ok = true;
     
     serializedAnswer.clear();
     {
-      Return<void> r = execute(request.type(), &serializedAnswer);
+      Return<void> r = execute(request, &serializedAnswer);
       if (!r.success) {
         std::cout << "Fail on command execution" << std::endl;
         continue;
@@ -94,12 +97,3 @@ bool ok = true;
 
 
 } //tvirt
-
-
-
-
-
-
-
-
-
