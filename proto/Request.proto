@@ -1,0 +1,21 @@
+package tvirt;
+
+message Request{
+  enum Type {
+    DOMAIN_DESTROY = 0;
+    DOMAIN_REBOOT  = 1;
+    DOMAIN_START   = 2;
+  }
+
+  required Type   type       = 1;
+  optional int64  requestID  = 2;
+  optional int32  domainID   = 3;
+  optional string domainName = 4;
+}
+
+
+message Reply {
+  required bool   success    = 1;
+  optional string reason     = 2;
+  optional int64  requestID  = 3;
+}
