@@ -16,7 +16,9 @@ private:
   Return<std::string> connect();
 
 public:
-  ClientZmq(const std::string &address, const uint16_t port);
+  ClientZmq(const std::string &address, 
+            const uint16_t port,
+            const int type);
 };
 } //comm
 

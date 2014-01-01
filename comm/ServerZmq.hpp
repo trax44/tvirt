@@ -21,7 +21,9 @@ protected:
   
 public:
 
-  ServerZmq(const std::string &address, const uint16_t port);
+  ServerZmq(const std::string &address, 
+            const uint16_t port, 
+            const int type);
 
 };
 
