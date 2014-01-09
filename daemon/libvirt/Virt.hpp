@@ -34,7 +34,7 @@ public:
 
   const Hypervisor & getHypervisor();
   const Return<void> rebootDomain (const DomainID id);
-
+  const Return<void> rebootForceDomain (const DomainID id);
 };
 
     

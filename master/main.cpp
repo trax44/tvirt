@@ -8,6 +8,7 @@
 #include "../proto/Hypervisor.pb.h"
 
 
+
 int main(int argc, char *argv[]) {
   
   if (argc != 3) {
@@ -39,8 +40,7 @@ int main(int argc, char *argv[]) {
   if (!hypervisor.ParseFromString(ret.data)){
     std::cerr << "Failed to parse received data" << std::endl;
     return -1;
-  }
-  
+  }  
   
 
   std::cout << "type      " << hypervisor.type()        << std::endl;
@@ -54,20 +54,29 @@ int main(int argc, char *argv[]) {
 
   }
 
-  
 
+  req.Clear();
+  request.clear();
+  ret.success = false;
+
+  req.set_type(req.DOMAIN_DESTROY);
+  req.set_domainid(3);
+  
+  req.SerializeToString(&request);
+  requester.send(request);
+  
+  n = requester.recv(&ret);
+
+  if (!ret.success) {
+    std::cerr << "receive failed " << ret.data << std::endl;
+    return -1;
+  } else {
+    std::cout << "reboot ok " << std::endl;
+  }
+
+  
+  
 
 
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-

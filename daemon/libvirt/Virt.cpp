@@ -92,6 +92,22 @@ const Return<void> Virt::rebootDomain (const DomainID id) {
   
 }
 
+
+const Return<void> Virt::rebootForceDomain (const DomainID id) {
+  virDomainPtr domainPtr;
+
+  if ((domainPtr = virDomainLookupByID (conn, id)) == NULL){
+    return false;
+  }
+  
+  if (virDomainDestroy(domainPtr) == 0){
+    return true;
+  } else {
+    return false;
+  }
+  
+}
+
     
 } //daemon
   

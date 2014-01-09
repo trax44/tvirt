@@ -22,30 +22,40 @@ Daemon::Daemon(const std::string &address,
 Return<void> Daemon::execute(const Request & request,
                              std::string *serializedAnswer){
   // \TODO: avoid copy of hypervisor (getHypervisor return reference)
+  Return<void> ret = true; 
+  std::cout << "executing command " << std::endl;
   
-    switch(request.type()){
-    case Request::DOMAIN_DESTROY:
-      
-      break;
-
-    case Request::DOMAIN_REBOOT:
-      break;
-
-    case Request::DOMAIN_START:
-      break;
-
-    case Request::DOMAIN_LIST:
-      {
-        const Hypervisor &hypervisor = virt.getHypervisor();
-        hypervisor.SerializeToString(serializedAnswer);
-      }
-      break;
-
-    default:
-      std::cerr << "Unknow command " << request.type() << std::endl;
+  switch(request.type()){
+  case Request::DOMAIN_DESTROY:
+    if (!request.has_domainid()){
       return false;
     }
-    return true;
+    ret =  virt.rebootForceDomain(request.domainid());
+    break;
+
+  case Request::DOMAIN_REBOOT:
+    if (!request.has_domainid()){
+      return false;
+    }
+    ret =  virt.rebootDomain(request.domainid());
+    break;
+
+  case Request::DOMAIN_START:
+    break;
+
+  case Request::DOMAIN_LIST:
+    {
+      const Hypervisor &hypervisor = virt.getHypervisor();
+      hypervisor.SerializeToString(serializedAnswer);
+      ret = true;
+    }
+    break;
+
+  default:
+    std::cerr << "Unknow command " << request.type() << std::endl;
+    ret = false;
+  }
+  return ret;
 }
 
 void Daemon::handlerRequest(){
