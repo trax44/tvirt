@@ -31,7 +31,7 @@ Return<std::string> Zmq::init(const int type) {
 }
 
 
-Return<int> Zmq::send(const std::string &message) {
+Return<int> Zmq::send(const std::string &message, bool more) {
   int n;
   
   if (socket == NULL){
@@ -41,12 +41,16 @@ Return<int> Zmq::send(const std::string &message) {
   }
 
   
-  if ((n = zmq_send(socket, message.data(), message.size(), 0)) == -1){
+  if ((n = zmq_send(socket, message.data(), message.size(), (more)?ZMQ_SNDMORE:0)) == -1){
     std::cout << "failed to send " << zmq_strerror(zmq_errno()) << std::endl;
     return false;
   } else {
     return Return<int>(true, n);
   }
+}
+
+Return<int> Zmq::send(const std::string &message) {
+  return send(message, false);
 }
 
 int Zmq::recv(Return<std::string> *ret) {

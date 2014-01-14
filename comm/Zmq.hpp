@@ -23,6 +23,7 @@ public:
                         type(type){}
   Return<std::string>init(const int type);
   int recv(Return<std::string> *ret);
+  Return<int>send(const std::string &message, bool more);
   Return<int>send(const std::string &message);
 
 
