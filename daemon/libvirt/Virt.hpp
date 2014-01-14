@@ -15,26 +15,25 @@ namespace daemon {
     
 class Virt {
 public:
-  typedef int DomainID;
+    typedef int DomainID;
 
 private:
   
-  virConnectPtr conn; 
+    virConnectPtr conn; 
 
-  tvirt::Hypervisor hypervisor;
+    tvirt::Hypervisor hypervisor;
 
-  Return<void> getListInactiveVm(Hypervisor &);
-  Return<void> getListActiveVm(Hypervisor &);
+    Return<void> getListAllDomains(Hypervisor &hypervisor);
 
 public:
-  Virt();
-  // Return<List> getListInactiveVm();
-  // Return<List> getListActiveVm();
-  // Return<List> getListAllVm();
+    Virt();
+    // Return<List> getListInactiveVm();
+    // Return<List> getListActiveVm();
+    // Return<List> getListAllVm();
 
-  const Hypervisor & getHypervisor();
-  const Return<void> rebootDomain (const DomainID id);
-  const Return<void> rebootForceDomain (const DomainID id);
+    const Hypervisor & getHypervisor();
+    const Return<void> rebootDomain (const DomainID id);
+    const Return<void> rebootForceDomain (const DomainID id);
 };
 
     

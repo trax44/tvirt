@@ -71,8 +71,8 @@ void Daemon::handlerRequest(){
     replyer.recv(&message);
     
     if (!message.success){
-      std::cerr << "Fail to receive message" << std::endl;
-      continue;
+        std::cerr << "Fail to receive message " << message.data << std::endl;
+        continue;
     }
     
     if (!request.ParseFromString(message.data)) {

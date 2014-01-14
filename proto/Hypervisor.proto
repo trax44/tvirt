@@ -29,7 +29,7 @@ message Host {
 
 message Guest {
   required Host host = 1;
-  required int64 id = 2;
+  required string id = 2;
 }
 message Hypervisor {
   enum Type {

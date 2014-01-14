@@ -19,51 +19,36 @@ Virt::Virt() :
 }
 
 
-Return<void> Virt::getListInactiveVm(Hypervisor &hypervisor) {
-  char *names[32];
-  int r;
-  if ((r = virConnectListDefinedDomains (conn, &names[0], 32)) < 1){
-    return false;
-  }
 
-  while (r--) {
-    Guest* guest = hypervisor.add_guests();
+Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
+    virDomainPtr *domainList;
 
-    guest->mutable_host()->set_name(names[r]);
-    std::cout << "NAMES " << names[r] << std::endl;
-    guest->set_id(-1);
-  }
+    int n = virConnectListAllDomains(conn, 
+                                     &domainList,
+                                     VIR_CONNECT_LIST_DOMAINS_ACTIVE |VIR_CONNECT_LIST_DOMAINS_INACTIVE);
+    std::vector<unsigned char> tmp (VIR_UUID_BUFLEN);
+    
+    for (int i = 0 ; i < n ; ++i){
+        Guest* guest = hypervisor.add_guests();
+        
+        guest->mutable_host()->set_name(virDomainGetName(domainList[i]));
+        guest->mutable_host()->set_nbcpu(virDomainGetMaxVcpus(domainList[i]));
+        
+        virDomainGetUUID(domainList[i], tmp.data());
+        
+            
+        guest->set_id(std::string(tmp.begin(), tmp.end()));
+    }
 
-  return true;
+    if (n > 0){
+        return true;
+    } else {
+        return false;
+    }
 }
 
-
-
-Return<void> Virt::getListActiveVm(Hypervisor &hypervisor) {
-  int ids [32];
-  int r;
-
-  
-  if ((r = virConnectListDomains (conn, ids, 32)) < 1) {
-    return false;
-  }
-  
-
-  while (r--) {
-    Guest* guest = hypervisor.add_guests();
-
-    virDomainPtr virDomain = virDomainLookupByID(conn, ids[r]);
-    std::cout << "NAMES " 
-              << virDomainGetName(virDomain) 
-              << ":" 
-              << ids[r] << std::endl;
-
-    guest->mutable_host()->set_name(virDomainGetName(virDomain));
-    guest->set_id(ids[r]);
-  }
-  return true;
-}
 // PUBLIC ======================================================================
+
 
 
 const tvirt::Hypervisor & Virt::getHypervisor() {
@@ -71,8 +56,7 @@ const tvirt::Hypervisor & Virt::getHypervisor() {
   hypervisor.set_type(Hypervisor_Type_UNKNOWN);
   hypervisor.mutable_host()->set_name(virConnectGetHostname(conn));
   
-  getListActiveVm(hypervisor);
-  getListInactiveVm(hypervisor);
+  getListAllDomains (hypervisor);
 
   return hypervisor;
 }
