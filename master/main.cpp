@@ -28,16 +28,16 @@ int main(int argc, char *argv[]) {
   req.SerializeToString(&request);
   requester.send(request);
 
-  Return<std::string> ret(false);
-  int n = requester.recv(&ret);
+  std::string data;
+  Return<int> ret = requester.recv(&data);
 
   if (!ret.success){
-    std::cerr << "receive failed " << ret.data << std::endl;
+    std::cerr << "receive failed " << data << std::endl;
     return -1;
   } 
 
   tvirt::Hypervisor hypervisor;
-  if (!hypervisor.ParseFromString(ret.data)){
+  if (!hypervisor.ParseFromString(data)){
     std::cerr << "Failed to parse received data" << std::endl;
     return -1;
   }  
@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
   req.SerializeToString(&request);
   requester.send(request);
   
-  n = requester.recv(&ret);
+  ret = requester.recv(&data);
 
   if (!ret.success) {
-    std::cerr << "receive failed " << ret.data << std::endl;
+    std::cerr << "receive failed " << data << std::endl;
     return -1;
   } else {
     std::cout << "reboot ok " << std::endl;

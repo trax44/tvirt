@@ -61,43 +61,55 @@ Return<void> Daemon::execute(const Request & request,
 void Daemon::handlerRequest(){
   
   bool ok = true;
-  std::string serializedAnswer;
 
-  
-  Return<std::string> message(false);
+  Reply replyHeader;
+  std::string replyHeaderBuffer;
+
+  std::string replyBodyBuffer;
+
+
+  std::string requestBuffer;
   Request request;
   while (ok) {
-    message.data.clear();
-    replyer.recv(&message);
+    requestBuffer.clear();
+    Return<int> r = replyer.recv(&requestBuffer);
     
-    if (!message.success){
-        std::cerr << "Fail to receive message " << message.data << std::endl;
-        continue;
+    if (!r.success){
+      std::cerr << "Fail to receive message " << requestBuffer << std::endl;
+      continue;
     }
     
-    if (!request.ParseFromString(message.data)) {
+    if (!request.ParseFromString(requestBuffer)) {
       std::cerr << "Fail during parsing" << std::endl;
     }
     
-    serializedAnswer.clear();
-    {
-      Return<void> r = execute(request, &serializedAnswer);
-      if (!r.success) {
-        std::cout << "Fail on command execution" << std::endl;
-        continue;
-      }
-    }
-
-
-    {
-      Return<int>  r = replyer.send(serializedAnswer);
-      if (!r.success){
-        std::cerr << "Failed to send message " << std::endl;
-        continue;
-      }
+    replyBodyBuffer.clear();
+    
+    Return<void> execReturn = execute(request, &replyBodyBuffer);
+    if (!execReturn.success) {
+      std::cout << "Fail on command execution" << std::endl;
     }
 
     
+    replyHeader.set_success(execReturn.success);
+    if(request.has_requestid()){
+      replyHeader.set_requestid(request.requestid());
+    }
+    
+    replyHeader.SerializeToString(&replyHeaderBuffer);
+
+
+    {Return<int>  sendReturn = replyer.send(replyHeaderBuffer, true);
+      if (!sendReturn.success){
+        std::cerr << "Failed to send message " << std::endl;
+        ok = false;
+      }}
+
+    {Return<int>  sendReturn = replyer.send(replyBodyBuffer, false);
+    if (!sendReturn.success){
+      std::cerr << "Failed to send message " << std::endl;
+      ok = false;
+    }}
   }
 }
 

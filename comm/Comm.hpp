@@ -21,7 +21,7 @@ public:
        const uint16_t port) :   address(address),
                                 port(port){}
 
-  virtual int recv(Return<std::string> *) = 0;
+  virtual Return<int> recv(std::string *) = 0;
   virtual Return<int>send(const std::string &message) = 0;
 };
 

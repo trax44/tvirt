@@ -53,39 +53,52 @@ Return<int> Zmq::send(const std::string &message) {
   return send(message, false);
 }
 
-int Zmq::recv(Return<std::string> *ret) {
+
+/**
+ * \fn Return<int> Zmq::recv(std::string *data)
+ * \return -1 on fail. Return success is true is there are more data
+ */
+Return<int> Zmq::recv(std::string *data) {
   zmq_msg_t part;
+  Return<int> ret(true, 0);
 
   if (socket == NULL){
-    ret->data.append("Socket not initiliazed");
-    ret->success = false;
-    return 0;
+    ret.success = false;
+    data->append("Socket not initialized");
+    return ret;
   }
 
-  int rc = zmq_msg_init (&part);
+  ret.data = zmq_msg_init (&part);
   
-  if (rc != 0){
-    ret->data.append(zmq_strerror(zmq_errno()));
-    ret->success = false;
-    return 0;
+  if (ret.data != 0){
+    data->append(zmq_strerror(zmq_errno()));
+    ret.success = false;
+    return ret;
   }
   
-  rc = zmq_msg_recv (&part, socket, 0);
+  ret.data = zmq_msg_recv (&part, socket, 0);
   
-  if (rc == -1){
+  if (ret.data == -1){
     zmq_msg_close (&part); 
-    ret->data.append(zmq_strerror(zmq_errno()));
-    ret->success = false;
-    return 0;
+    data->append(zmq_strerror(zmq_errno()));
+    ret.success = false;
+    return ret;
   }
 
-  ret->success = true;
-  ret->data.append(static_cast<char*>(zmq_msg_data (&part)), 
-                   zmq_msg_size(&part));
+  ret.success = true;
+  data->append(static_cast<char*>(zmq_msg_data (&part)), 
+               zmq_msg_size(&part));
   
   zmq_msg_close (&part); 
 
-  return rc;
+
+  int64_t more;
+  size_t more_size = sizeof (more);
+  zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
+
+  ret.success = static_cast<bool>(more);
+
+  return ret;
 }
 
 
