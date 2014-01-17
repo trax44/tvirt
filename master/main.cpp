@@ -9,6 +9,53 @@
 
 
 
+Return<tvirt::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
+                     const tvirt::Request   &request,
+                     std::string *replyBuffer){
+  
+  tvirt::Reply replyHeader;
+  std::string buffer;
+  request.SerializeToString(&buffer);
+  
+  
+  requester.send(buffer);
+
+  std::string data;
+  Return<int> ret = requester.recv(&data);
+  
+  if (ret.data == -1){
+    std::cerr << "receive failed " << data << std::endl;
+    return false;
+  } 
+  
+  replyHeader.ParseFromString(data);
+  
+  if (ret.success){
+    Return<int> retBody = requester.recv(replyBuffer);
+    if (retBody.data == -1 || retBody.success){
+      std::cout << "Body " << retBody.data << ":" << retBody.success << std::endl;
+      return Return<tvirt::Reply>(false, replyHeader);
+    }
+  }
+
+  return Return<tvirt::Reply>(true, replyHeader);
+}
+
+void printHypervisor(const tvirt::Hypervisor &hypervisor){
+  std::cout << "type      " << hypervisor.type()        << std::endl;
+  std::cout << "host name " << hypervisor.host().name() << std::endl;
+    
+  for (int i = 0 , e = hypervisor.guests_size(); i < e ; i++){
+    std::cout << "  >"
+              << ((hypervisor.guests(i).active())?"ON  ":"OFF ")
+              << hypervisor.guests(i).host().name() 
+              << " UUID: " 
+              << hypervisor.guests(i).id()
+              << std::endl;
+
+  }
+}
+
 int main(int argc, char *argv[]) {
   
   if (argc != 3) {
@@ -18,65 +65,36 @@ int main(int argc, char *argv[]) {
               << std::endl;
     return -1;
   }
-
   tvirt::comm::ClientZmq requester(argv[1], atoi(argv[2]), ZMQ_REQ);
 
-  tvirt::Request req;
-  req.set_type(tvirt::Request::DOMAIN_LIST);
+  std::string buffer;
+  tvirt::Request request;
+  request.set_type(tvirt::Request::DOMAIN_LIST);
 
-  std::string request;
-  req.SerializeToString(&request);
-  requester.send(request);
-
-  std::string data;
-  Return<int> ret = requester.recv(&data);
-
+  Return<tvirt::Reply> ret = executeCommand(requester, request, &buffer);
   if (!ret.success){
-    std::cerr << "receive failed " << data << std::endl;
     return -1;
-  } 
-
+  }
+  
   tvirt::Hypervisor hypervisor;
-  if (!hypervisor.ParseFromString(data)){
+  if (!ret.data.success() || !hypervisor.ParseFromString(buffer)){
     std::cerr << "Failed to parse received data" << std::endl;
     return -1;
   }  
-  
 
-  std::cout << "type      " << hypervisor.type()        << std::endl;
-  std::cout << "host name " << hypervisor.host().name() << std::endl;
-  
+
+  printHypervisor(hypervisor);
+    
+
   for (int i = 0 , e = hypervisor.guests_size(); i < e ; i++){
-    std::cout << "  >" 
-              << hypervisor.guests(i).id()
-              << ":" 
-              << hypervisor.guests(i).host().name() << std::endl;
+    if (!hypervisor.guests(i).active()){
+      buffer.clear();
+      request.set_type(tvirt::Request::DOMAIN_START);
+      request.set_domainid(hypervisor.guests(i).id());
+      executeCommand(requester, request, &buffer);
+    }
 
   }
-
-
-  req.Clear();
-  request.clear();
-  ret.success = false;
-
-  req.set_type(req.DOMAIN_DESTROY);
-  req.set_domainid(3);
-  
-  req.SerializeToString(&request);
-  requester.send(request);
-  
-  ret = requester.recv(&data);
-
-  if (!ret.success) {
-    std::cerr << "receive failed " << data << std::endl;
-    return -1;
-  } else {
-    std::cout << "reboot ok " << std::endl;
-  }
-
-  
-  
-
 
   return 0;
 }

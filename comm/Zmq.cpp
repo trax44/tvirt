@@ -54,10 +54,6 @@ Return<int> Zmq::send(const std::string &message) {
 }
 
 
-/**
- * \fn Return<int> Zmq::recv(std::string *data)
- * \return -1 on fail. Return success is true is there are more data
- */
 Return<int> Zmq::recv(std::string *data) {
   zmq_msg_t part;
   Return<int> ret(true, 0);
@@ -89,14 +85,11 @@ Return<int> Zmq::recv(std::string *data) {
   data->append(static_cast<char*>(zmq_msg_data (&part)), 
                zmq_msg_size(&part));
   
+
+  ret.success = zmq_msg_more(&part);
+  
   zmq_msg_close (&part); 
 
-
-  int64_t more;
-  size_t more_size = sizeof (more);
-  zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
-
-  ret.success = static_cast<bool>(more);
 
   return ret;
 }

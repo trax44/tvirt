@@ -41,6 +41,10 @@ Return<void> Daemon::execute(const Request & request,
     break;
 
   case Request::DOMAIN_START:
+    if (!request.has_domainid()){
+      return false;
+    }
+    return ((virDomainCreate(reinterpret_cast<virDomainPtr>(request.domainid())) == 0)?true:false);
     break;
 
   case Request::DOMAIN_LIST:
@@ -74,7 +78,7 @@ void Daemon::handlerRequest(){
     requestBuffer.clear();
     Return<int> r = replyer.recv(&requestBuffer);
     
-    if (!r.success){
+    if (r.data == -1){
       std::cerr << "Fail to receive message " << requestBuffer << std::endl;
       continue;
     }
@@ -86,9 +90,6 @@ void Daemon::handlerRequest(){
     replyBodyBuffer.clear();
     
     Return<void> execReturn = execute(request, &replyBodyBuffer);
-    if (!execReturn.success) {
-      std::cout << "Fail on command execution" << std::endl;
-    }
 
     
     replyHeader.set_success(execReturn.success);
@@ -99,17 +100,16 @@ void Daemon::handlerRequest(){
     replyHeader.SerializeToString(&replyHeaderBuffer);
 
 
-    {Return<int>  sendReturn = replyer.send(replyHeaderBuffer, true);
-      if (!sendReturn.success){
-        std::cerr << "Failed to send message " << std::endl;
-        ok = false;
-      }}
-
-    {Return<int>  sendReturn = replyer.send(replyBodyBuffer, false);
+    Return<int>  sendReturn = replyer.send(replyHeaderBuffer, true);
     if (!sendReturn.success){
       std::cerr << "Failed to send message " << std::endl;
       ok = false;
-    }}
+    }
+    
+
+    if (execReturn.success) {
+      Return<int>  sendReturn = replyer.send(replyBodyBuffer, false);
+    }
   }
 }
 

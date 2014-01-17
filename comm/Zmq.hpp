@@ -22,6 +22,11 @@ public:
        const int type): Comm::Comm(address, port), 
                         type(type){}
   Return<std::string>init(const int type);
+
+  /**
+   * \fn Return<int> Zmq::recv(std::string *data)
+   * \return -1 on fail else message size received. Return success value is true if there are more data to read
+   */
   Return<int> recv(std::string *ret);
 
   Return<int>send(const std::string &message, bool more);

@@ -8,10 +8,10 @@ message Request{
     DOMAIN_LIST    = 3;
   }
 
-  required Type   type       = 1;
-  optional int64  requestID  = 2;
-  optional int32  domainID   = 3;
-  optional string domainName = 4;
+  required Type     type       = 1;
+  optional int64    requestID  = 2;
+  optional fixed64  domainID   = 3;
+  optional string   domainName = 4;
 }
 
 

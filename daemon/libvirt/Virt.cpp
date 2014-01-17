@@ -32,12 +32,10 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
         Guest* guest = hypervisor.add_guests();
         
         guest->mutable_host()->set_name(virDomainGetName(domainList[i]));
-        guest->mutable_host()->set_nbcpu(virDomainGetMaxVcpus(domainList[i]));
-        
-        virDomainGetUUID(domainList[i], tmp.data());
-        
-            
-        guest->set_id(std::string(tmp.begin(), tmp.end()));
+        // guest->mutable_host()->set_nbcpu(virDomainGetMaxVcpus(domainList[i]));
+        guest->set_id(reinterpret_cast<uint64_t>(domainList[i]));
+        guest->set_active(((virDomainIsActive(domainList[i]) == 1)?true:false));
+
     }
 
     if (n > 0){

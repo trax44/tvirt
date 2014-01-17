@@ -28,8 +28,9 @@ message Host {
 
 
 message Guest {
-  required Host host = 1;
-  required string id = 2;
+  required Host    host    = 1;
+  required fixed64 id      = 2;
+  required bool    active  = 3;
 }
 message Hypervisor {
   enum Type {
