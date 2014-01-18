@@ -29,8 +29,9 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
     std::vector<unsigned char> tmp (VIR_UUID_BUFLEN);
     
     for (int i = 0 ; i < n ; ++i){
+      std::cout << hypervisor.guests().size() << std::endl;
+
         Guest* guest = hypervisor.add_guests();
-        
         guest->mutable_host()->set_name(virDomainGetName(domainList[i]));
         // guest->mutable_host()->set_nbcpu(virDomainGetMaxVcpus(domainList[i]));
         guest->set_id(reinterpret_cast<uint64_t>(domainList[i]));
@@ -50,7 +51,7 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
 
 
 const tvirt::Hypervisor & Virt::getHypervisor() {
-
+  hypervisor.Clear();
   hypervisor.set_type(Hypervisor_Type_UNKNOWN);
   hypervisor.mutable_host()->set_name(virConnectGetHostname(conn));
   
