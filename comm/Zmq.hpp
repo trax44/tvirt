@@ -12,11 +12,11 @@ namespace comm {
 
 class Zmq :public Comm{
 protected:
-  void *context;
   void *socket;
   std::string endPoint;
   int type;
 public:
+  static void *context;
   Zmq (const std::string &address, 
        const uint16_t port,
        const int type): Comm::Comm(address, port), 
@@ -38,6 +38,7 @@ public:
 
 } //comm
 } //tvirt
+
 
 
 #endif /* TVIRT_COMM */

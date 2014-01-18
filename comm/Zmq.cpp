@@ -5,6 +5,7 @@
 
 namespace tvirt {
 namespace comm {
+void * Zmq::context = NULL;
 
 Return<std::string> Zmq::init(const int type) {
   std::stringstream ss;
@@ -15,13 +16,15 @@ Return<std::string> Zmq::init(const int type) {
 
   std::cout << "endPoint " << endPoint << std::endl;
 
-  if ((context = zmq_init(1)) == NULL) {
-    return Return<std::string> (false, 
-                                "Failed to init zmq with 1 thread ("
-                                + std::string(zmq_strerror(zmq_errno())) +")");
-  }
+  if (Zmq::context == NULL){
+    if ((Zmq::context = zmq_init(1)) == NULL) {
+      return Return<std::string> (false, 
+                                  "Failed to init zmq with 1 thread ("
+                                  + std::string(zmq_strerror(zmq_errno())) +")");
+    }
 
-  if ((socket = zmq_socket(context, type)) == NULL){
+  }
+  if ((socket = zmq_socket(Zmq::context, type)) == NULL){
     return Return<std::string> (false, 
                                 "Failed to to create socket ("
                                 + std::string(zmq_strerror(zmq_errno())) +")");
