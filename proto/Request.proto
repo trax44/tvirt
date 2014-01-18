@@ -1,12 +1,15 @@
 package tvirt;
 
+enum Type {
+  DOMAIN_DESTROY    = 0;
+  DOMAIN_REBOOT     = 1;
+  DOMAIN_START      = 2;
+  DOMAIN_LIST       = 3;
+  DOMAIN_GET_STATE  = 4;
+}
+
+
 message Request{
-  enum Type {
-    DOMAIN_DESTROY = 0;
-    DOMAIN_REBOOT  = 1;
-    DOMAIN_START   = 2;
-    DOMAIN_LIST    = 3;
-  }
 
   required Type     type       = 1;
   optional int64    requestID  = 2;
@@ -17,6 +20,8 @@ message Request{
 
 message Reply {
   required bool   success    = 1;
-  optional string reason     = 2;
-  optional int64  requestID  = 3;
+  required Type   type       = 2;
+  optional string reason     = 3;
+  optional int64  requestID  = 4;
 }
+

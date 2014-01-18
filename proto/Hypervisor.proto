@@ -47,3 +47,24 @@ message Hypervisor {
 
   repeated Guest guests  = 3;
 }
+
+
+
+
+message CPU {
+  required int32 id     = 1;
+  required int32 level  = 2;
+}
+
+message Memory {
+  required int64 total = 1;
+  required int64 used  = 2;
+
+}
+
+message MonitoringState {
+  required Guest  guest  = 1;
+  repeated CPU    cpus   = 2;
+  required Memory memory = 3;
+  optional int32 io      = 4;
+}
