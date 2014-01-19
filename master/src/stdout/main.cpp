@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "../comm/ClientZmq.hpp"
-#include "../proto/Request.pb.h"
+#include "../../../comm/ClientZmq.hpp"
+#include "../../../proto/Request.pb.h"
 
-#include "../proto/Hypervisor.pb.h"
+#include "../../../proto/Hypervisor.pb.h"
 
 
 
@@ -65,9 +65,10 @@ void printHypervisor(const tvirt::Hypervisor &hypervisor){
 }
 
 void printCPU(const tvirt::CPU &cpu){
-  std::cout << "CPU " 
-            << cpu.id() 
-            << cpu.level() 
+  std::cout << "CPU nb " 
+            << cpu.nbcpu()
+            << " " 
+            << cpu.time()
             << std::endl;
 }
 
@@ -81,13 +82,10 @@ void printMemory (const tvirt::Memory &memory){
 
 void printMonitoringState (const tvirt::MonitoringState &monitoringState) {
   std::cout << "Monitoring state" << std::endl;
-  for (int i = 0 , e = monitoringState.cpus_size(); i < e ; i++){
-    printCPU (monitoringState.cpus(i));
-  }
+  printCPU (monitoringState.cpu());
  
   printMemory(monitoringState.memory());
   std::cout << "IO " << monitoringState.io() << std::endl;
-
 }
 
 void printBody (const tvirt::Reply &reply,
@@ -186,23 +184,25 @@ int main(int argc, char *argv[]) {
 
   std::string buffer;
   tvirt::Request request;
+  
+  // request domain list 
   request.set_type(tvirt::DOMAIN_LIST);
-
   Return<tvirt::Reply> ret = executeCommand(requester, request, &buffer);
   if (!ret.success){
     return -1;
   }
   
+  // handling result 
   tvirt::Hypervisor hypervisor;
   if (!ret.data.success() || !hypervisor.ParseFromString(buffer)){
     std::cerr << "Failed to parse received data" << std::endl;
     return -1;
   }
 
-
   printHypervisor(hypervisor);
     
 
+  // start all the inactive domains
   for (int i = 0 , e = hypervisor.guests_size(); i < e ; i++){
     if (!hypervisor.guests(i).active()){
       buffer.clear();
@@ -210,8 +210,32 @@ int main(int argc, char *argv[]) {
       request.set_domainid(hypervisor.guests(i).id());
       executeCommand(requester, request, &buffer);
     }
-
   }
+
+
+
+
+  if (hypervisor.guests_size() > 0){
+    std::cout << "Asking for guest info" << std::endl;
+    // request guest monitoring state 
+    request.set_type(tvirt::DOMAIN_GET_STATE);
+    request.set_domainid(hypervisor.guests(0).id());
+    Return<tvirt::Reply> ret = executeCommand(requester, request, &buffer);
+    if (!ret.success){
+      std::cout << "Failed to retrieve information" << std::endl;
+      return -1;
+    }
+  
+    // handling result 
+    tvirt::MonitoringState monitoringState;
+    if (!ret.data.success() || !monitoringState.ParseFromString(buffer)){
+      std::cerr << "Failed to parse received data" << std::endl;
+      return -1;
+    }
+
+    printMonitoringState(monitoringState);
+  }
+
 
   return 0;
 }

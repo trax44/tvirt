@@ -21,7 +21,7 @@ Daemon::Daemon(const std::string &address,
 
 Return<void> Daemon::execute(const Request & request,
                              std::string *serializedAnswer){
-  // \TODO: avoid copy of hypervisor (getHypervisor return reference)
+#warning clean ret vs return 
   Return<void> ret = true; 
   std::cout << "executing command " << std::endl;
   
@@ -44,16 +44,36 @@ Return<void> Daemon::execute(const Request & request,
     if (!request.has_domainid()){
       return false;
     }
-    return ((virDomainCreate(reinterpret_cast<virDomainPtr>(request.domainid())) == 0)?true:false);
+    return ((virDomainCreate(reinterpret_cast<virDomainPtr>(request.domainid())) == 0)?
+            true:false);
     break;
 
   case DOMAIN_LIST:
     {
-      const Hypervisor &hypervisor = virt.getHypervisor();
-      hypervisor.SerializeToString(serializedAnswer);
+      const Return<const Hypervisor &>hypervisor = virt.getHypervisor();
+      if (hypervisor.success){
+        hypervisor.data.SerializeToString(serializedAnswer);
+        ret = true;
+      } else {
+        ret = false;
+      }
+    }
+    break;
+  case DOMAIN_GET_STATE:
+    {
+      if (!request.has_domainid()){
+        return false;
+      }
+      const Return<const MonitoringState &> monitoringState = 
+        virt.getMonitoringState(request.domainid());
+      if (!monitoringState.success) {
+        return false;
+      }
+      monitoringState.data.SerializeToString(serializedAnswer);
       ret = true;
     }
     break;
+
 
   default:
     std::cerr << "Unknow command " << request.type() << std::endl;
@@ -87,11 +107,16 @@ void Daemon::handlerRequest(){
       std::cerr << "Fail during parsing" << std::endl;
     }
     
+    replyHeaderBuffer.clear();
     replyBodyBuffer.clear();
     
     Return<void> execReturn = execute(request, &replyBodyBuffer);
 
-    
+    if (!execReturn.success) {
+      std::cout << "failed to execute command" << std::endl;
+    }
+
+    replyHeader.set_type(request.type());
     replyHeader.set_success(execReturn.success);
     if(request.has_requestid()){
       replyHeader.set_requestid(request.requestid());

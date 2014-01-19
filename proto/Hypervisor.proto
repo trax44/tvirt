@@ -41,30 +41,26 @@ message Hypervisor {
     UNKNOWN = 4;
   }
 
-
-  required Type type    = 1;
-  required Host host    = 2;  
+  required Type type     = 1;
+  required Host host     = 2;  
 
   repeated Guest guests  = 3;
 }
 
-
-
-
 message CPU {
-  required int32 id     = 1;
-  required int32 level  = 2;
+  required int32   nbCpu  = 1;
+  required fixed64 time   = 2;
 }
 
 message Memory {
   required int64 total = 1;
   required int64 used  = 2;
-
 }
 
 message MonitoringState {
-  required Guest  guest  = 1;
-  repeated CPU    cpus   = 2;
-  required Memory memory = 3;
-  optional int32 io      = 4;
+  required fixed64  guestID  = 1;
+  required CPU      cpu      = 2;
+  required Memory   memory   = 3;
+  required fixed32  time     = 4;
+  optional int32    io       = 5;
 }

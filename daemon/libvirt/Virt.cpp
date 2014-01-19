@@ -20,23 +20,25 @@ Virt::Virt() :
 
 
 
+void Virt::setGuest(Guest *guest, const virDomainPtr domainPtr) {
+  guest->mutable_host()->set_name(virDomainGetName(domainPtr));
+  guest->set_id(reinterpret_cast<uint64_t>(domainPtr));
+  guest->set_active(((virDomainIsActive(domainPtr) == 1)?true:false));
+}
+
 Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
     virDomainPtr *domainList;
 
     int n = virConnectListAllDomains(conn, 
                                      &domainList,
-                                     VIR_CONNECT_LIST_DOMAINS_ACTIVE |VIR_CONNECT_LIST_DOMAINS_INACTIVE);
+                                     VIR_CONNECT_LIST_DOMAINS_ACTIVE 
+                                     |VIR_CONNECT_LIST_DOMAINS_INACTIVE);
+
     std::vector<unsigned char> tmp (VIR_UUID_BUFLEN);
     
     for (int i = 0 ; i < n ; ++i){
-      std::cout << hypervisor.guests().size() << std::endl;
-
         Guest* guest = hypervisor.add_guests();
-        guest->mutable_host()->set_name(virDomainGetName(domainList[i]));
-        // guest->mutable_host()->set_nbcpu(virDomainGetMaxVcpus(domainList[i]));
-        guest->set_id(reinterpret_cast<uint64_t>(domainList[i]));
-        guest->set_active(((virDomainIsActive(domainList[i]) == 1)?true:false));
-
+        setGuest(guest, domainList[i]);
     }
 
     if (n > 0){
@@ -49,13 +51,33 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
 // PUBLIC ======================================================================
 
 
+const Return<const tvirt::MonitoringState &> Virt::getMonitoringState (const DomainID id) {
+  virDomainInfo info;
+  if (virDomainGetInfo(reinterpret_cast<virDomainPtr>(id), &info) == -1){
+    return Return<const tvirt::MonitoringState &>(false, monitoringState);
+  }
+  
+  monitoringState.set_guestid(id);
+  monitoringState.mutable_cpu()->set_nbcpu(info.nrVirtCpu);
+  monitoringState.mutable_cpu()->set_time(info.cpuTime);
+  monitoringState.mutable_memory()->set_used(info.memory);
+  monitoringState.mutable_memory()->set_total(info.maxMem);
+  monitoringState.set_time(time(NULL));
 
-const tvirt::Hypervisor & Virt::getHypervisor() {
+  
+  return monitoringState;
+}
+
+
+const Return<const tvirt::Hypervisor &> Virt::getHypervisor() {
   hypervisor.Clear();
   hypervisor.set_type(Hypervisor_Type_UNKNOWN);
   hypervisor.mutable_host()->set_name(virConnectGetHostname(conn));
   
-  getListAllDomains (hypervisor);
+  Return <void> r = getListAllDomains (hypervisor);
+  if (!r.success){
+    return Return<const tvirt::Hypervisor &>(false, hypervisor);
+  }
 
   return hypervisor;
 }
