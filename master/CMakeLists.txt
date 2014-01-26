@@ -1,2 +1,3 @@
 
-add_subdirectory (src/stdout)
+add_subdirectory (src)
+
