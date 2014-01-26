@@ -3,6 +3,8 @@ add_executable(
   web/main.cpp
   Requester.hpp
   Requester.cpp
+  web/HypervisorConnect.cpp
+  web/HypervisorConnect.hpp
   )
 
 
