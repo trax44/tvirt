@@ -8,3 +8,6 @@ tvirtd
 *.pb.h
 *.a
 *.o
+
+master/src/master-web
+master/src/master-stdout
