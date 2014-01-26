@@ -1,56 +1,21 @@
 #include <list>
 
 #include <Wt/WApplication>
-#include <Wt/WBreak>
-#include <Wt/WContainerWidget>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
-#include <Wt/WText>
-#include <Wt/WVBoxLayout>
-#include <Wt/WHBoxLayout>
+// #include <Wt/WBreak>
 
-#include <Wt/WIconPair>
-#include <Wt/WText>
-#include <Wt/WTree>
-#include <Wt/WTreeNode>
+// #include <Wt/WIconPair>
+// #include <Wt/WText>
+// #include <Wt/WTree>
+// #include <Wt/WTreeNode>
 
 #include "../Requester.hpp"
-
+#include "HypervisorConnect.hpp"
 
 namespace tvirt {
 
 namespace master  {
 
 namespace web {
-
-class HypervisorConnect : public Wt::WContainerWidget {
-private:
-  Wt::WLineEdit     wtAddress;
-  Wt::WLineEdit     wtPort;
-  void connect();
-  
-public:
-  HypervisorConnect(Wt::WContainerWidget *parent);
-};
-
-HypervisorConnect::HypervisorConnect(Wt::WContainerWidget *parent) {
-
-  Wt::WPushButton *wtSubmit = new Wt::WPushButton("Conenct");
-  Wt::WVBoxLayout *vbox = new Wt::WVBoxLayout();
-  vbox->addWidget(new Wt::WText("Address"));
-  vbox->addWidget(&wtAddress);
-  vbox->addWidget(new Wt::WText("Port"));
-  vbox->addWidget(&wtPort);
-  vbox->addWidget(wtSubmit);
-
-  wtSubmit->clicked().connect(this, &HypervisorConnect::connect);
-  
-  this->setLayout(vbox);
-}
-
-void HypervisorConnect::connect() {
-  
-}
 
 
 
