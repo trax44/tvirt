@@ -1,8 +1,12 @@
 add_executable(
   master-web
-  web/main.cpp
   Requester.hpp
   Requester.cpp
+  ViewControler.cpp
+  ViewControler.hpp
+  ViewModel.hpp
+
+  web/main.cpp
   web/HypervisorConnect.cpp
   web/HypervisorConnect.hpp
   )
