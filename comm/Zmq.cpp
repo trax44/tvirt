@@ -29,7 +29,7 @@ Return<std::string> Zmq::init(const int type) {
                                 "Failed to to create socket ("
                                 + std::string(zmq_strerror(zmq_errno())) +")");
   }
-
+  
   return true;
 }
 
@@ -48,6 +48,7 @@ Return<int> Zmq::send(const std::string &message, bool more) {
     std::cout << "failed to send " << zmq_strerror(zmq_errno()) << std::endl;
     return false;
   } else {
+    std::cout << "send" << std::endl;
     return Return<int>(true, n);
   }
 }
@@ -66,6 +67,7 @@ Return<int> Zmq::recv(std::string *data) {
     data->append("Socket not initialized");
     return ret;
   }
+  std::cout << "recv" << std::endl;
 
   ret.data = zmq_msg_init (&part);
   

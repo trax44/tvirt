@@ -32,6 +32,10 @@ public:
   // Return<List> getListAllVm();
   void                                 setGuest          (Guest *guest, 
                                                           const virDomainPtr domainPtr);
+
+  Return<void>                         setHost           (Host *host, 
+                                                          const virDomainPtr domainPtr);
+
   const Return<const Hypervisor&>      getHypervisor     ();
   const Return<const MonitoringState&> getMonitoringState(const DomainID id);
   const Return<void>                   rebootDomain      (const DomainID id);

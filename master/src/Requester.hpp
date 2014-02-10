@@ -24,6 +24,11 @@ private:
 public:
   Requester(const std::string &address,
             const uint16_t port);
+
+
+  Return<Reply> executeCommand (const tvirt::Request &request,
+                                std::string *replyBuffer);
+  
   
 
   /**

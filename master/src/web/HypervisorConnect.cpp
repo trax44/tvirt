@@ -1,5 +1,4 @@
 #include "HypervisorConnect.hpp"
-#include <boost/bind.hpp>
 #include <stdlib.h>
 #include <iostream>
 namespace tvirt {
@@ -15,8 +14,8 @@ HypervisorConnect::HypervisorConnect():Wt::WDialog("Connection"),
 
   setStyleClass("dialog");
     
-  setModal(true);
-  
+
+
   Wt::WPushButton *ok = new Wt::WPushButton("OK", footer());
   ok->setDefault(true);
 
@@ -33,7 +32,14 @@ HypervisorConnect::HypervisorConnect():Wt::WDialog("Connection"),
   
   validator.setMandatory(true);
   wtPort.setValidator(&validator);
-  
+
+  setOffsets(0, Wt::Top);
+  animateShow
+    (Wt::WAnimation(Wt::WAnimation::SlideInFromTop
+                | Wt::WAnimation::Fade, Wt::WAnimation::Linear, 250));
+
+
+
   show();
 }
 

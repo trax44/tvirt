@@ -1,3 +1,4 @@
+SET(CMAKE_CXX_FLAGS "-std=c++11") 
 add_executable(
   master-web
   Requester.hpp
@@ -9,6 +10,8 @@ add_executable(
   web/main.cpp
   web/HypervisorConnect.cpp
   web/HypervisorConnect.hpp
+  web/Hypervisor.hpp
+  web/Hypervisor.cpp
   )
 
 

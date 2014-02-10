@@ -1,5 +1,9 @@
 #include <list>
 
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <pthread.h>
 #include <unistd.h>
 
@@ -8,15 +12,16 @@
 #include <Wt/WDialog>
 #include <Wt/WServer>
 #include <Wt/WMessageBox>
+#include <Wt/WBootstrapTheme>
+#include <Wt/WTable>
+#include <Wt/WText>
 
 #include "../Requester.hpp"
 #include "HypervisorConnect.hpp"
+#include "Hypervisor.hpp"
 #include "../ViewModel.hpp"
 #include "../ViewControler.hpp"
 
-#include <iostream>
-#include <stdio.h>
-#include <string>
 namespace tvirt {
 
 namespace master  {
@@ -29,56 +34,79 @@ class WebGUI : public Wt::WApplication ,
                public ViewModel {
 public:
   WebGUI (const Wt::WEnvironment& env);
-  Return<std::pair<std::string, uint16_t> > askForHypervisorConnection();
 
 private:
   ViewControler controler;
   
-  void run();
   void request();
   std::list<Requester> hypervisorsConnection;
   HypervisorConnect *hypervisorConnection;
 
+  Wt::WVBoxLayout globalLayout;
+
   void addHypervisor(const std::string address, uint16_t port);
-  void addHypervisor2();
+  void removeHypervisorDialog();
+  void askForHypervisorConnection();
 };
 
 
-void WebGUI::run(){
-  controler.run();
-}
 
 WebGUI::WebGUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
-    controler(this)
-{
+    controler(this) {
+
   setTitle("Enyx Cloud Administration Tool");
-  useStyleSheet("web/css.css");
-
-  Wt::WPushButton *run = new Wt::WPushButton("run");
-  run->clicked().connect(this, &WebGUI::run);
-
-  // root()->addWidget((hypervisorConnection = new HypervisorConnect()));
-  // hypervisorConnection->res().connect(this, &WebGUI::addHypervisor);
-  // hypervisorConnection->finished().connect(this, &WebGUI::addHypervisor2);
+  //useStyleSheet("web/css.css");
+  
+  root()->setLayout(&globalLayout);
+  askForHypervisorConnection();
+  setTheme(new Wt::WBootstrapTheme());
+  //setCssTheme("polished");
 }
 
+void WebGUI::removeHypervisorDialog(){
+  std::cout << "hyp res " << hypervisorConnection->result() << std::endl;
 
-void WebGUI::addHypervisor2(){
-  std::cout << "deleting " << ((hypervisorConnection->result() == Wt::WDialog::Accepted)?"true":"false")<< std::endl;
   delete hypervisorConnection;
+  hypervisorConnection = NULL;
 }
-void WebGUI::addHypervisor(const std::string address, uint16_t port){
+
+void WebGUI::askForHypervisorConnection(){
+  hypervisorConnection = new HypervisorConnect();
+  hypervisorConnection->res().connect(this, &WebGUI::addHypervisor);
+  hypervisorConnection->finished().connect(this, &WebGUI::removeHypervisorDialog);
+  
+}
+
+
+void WebGUI::addHypervisor(const std::string address, uint16_t port) {
   std::cout << "checking hypervision connection information" << std::endl;
   Return<ViewControler::ConnectionID> connection = controler.addConnection(address, port);
   
-  Wt::WMessageBox *answer;
-  if (connection.success){
-    answer = new Wt::WMessageBox(":)", "Connecting" , Wt::Information, Wt::Ok);
+  if (connection.success) {
+    auto r = controler.connectToHypervisor(connection.data);
+    if (!r.success){
+      return;
+    }
+    
+    globalLayout.addWidget(new web::Hypervisor(r.data), 0);
+    globalLayout.addWidget(new Wt::WText(""), 1);
+    
   } else {
-    answer = new Wt::WMessageBox("FAIL", "Fail to connect to hypervisor" , Wt::Critical, Wt::Ok);
+    Wt::WMessageBox * notification = 
+      new Wt::WMessageBox("Fail", 
+                          "Fail to connect to hypervisor<br/> Retry?", 
+                          Wt::Critical, 
+                          Wt::Yes|Wt::No);
+
+    notification->buttonClicked().connect(std::bind([=] () {
+          if (notification->buttonResult() == Wt::Yes) {
+            askForHypervisorConnection();
+          }
+          delete notification;
+        }));
+    notification->show();
   }
-  answer->show();
 }
 
 } // web

@@ -4,6 +4,11 @@ message Address {
   required string address = 1;
 }
 
+message CPU {
+  required int32   nbCpu  = 1;
+  required fixed64 time   = 2;
+}
+
 
 message Host {
   enum OS{
@@ -19,11 +24,12 @@ message Host {
     WIND   = 9;
   }
 
-  required string name      = 1;
-  optional Address address  = 2;
-  optional OS os            = 3;
-  optional int32 nbCPU      = 4;
-  optional int64 memory     = 5;
+  required string  name        = 1;
+  optional Address address     = 2;
+  optional OS      os          = 3;
+  optional CPU     cpu         = 4;
+  optional int64   memory      = 5;
+  optional int64   maxMemory   = 6;
 }
 
 
@@ -47,10 +53,6 @@ message Hypervisor {
   repeated Guest guests  = 3;
 }
 
-message CPU {
-  required int32   nbCpu  = 1;
-  required fixed64 time   = 2;
-}
 
 message Memory {
   required int64 total = 1;
