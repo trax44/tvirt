@@ -34,6 +34,7 @@ Return<std::string> ClientZmq::connect() {
   }
   
   if (zmq_connect (socket, endPoint.c_str()) != 0){
+    std::cout << "End Point " << endPoint << std::endl;
     return Return<std::string>(false, zmq_strerror(zmq_errno()));
   } else {
     return true;

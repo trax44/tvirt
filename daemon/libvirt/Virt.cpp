@@ -8,6 +8,8 @@
 
 namespace tvirt {
 namespace daemon {
+
+
     
 Virt::Virt() : 
   conn (NULL){
@@ -20,13 +22,31 @@ Virt::Virt() :
 
 
 
+Return<void> Virt::setHost (Host *host, const virDomainPtr domainPtr) {
+  virDomainInfo info;
+  if (virDomainGetInfo(domainPtr, &info) == -1){
+    return false;
+  }
+
+  host->set_name(virDomainGetName(domainPtr));
+
+  host->mutable_cpu()->set_nbcpu(info.nrVirtCpu);
+  host->mutable_cpu()->set_time(info.cpuTime);
+  host->set_memory(info.memory);
+  host->set_maxmemory(info.maxMem);
+
+  return true;
+}
+
+
 void Virt::setGuest(Guest *guest, const virDomainPtr domainPtr) {
-  guest->mutable_host()->set_name(virDomainGetName(domainPtr));
+  setHost (guest->mutable_host(), domainPtr);
+  
   guest->set_id(reinterpret_cast<uint64_t>(domainPtr));
   guest->set_active(((virDomainIsActive(domainPtr) == 1)?true:false));
 }
 
-Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
+Return<void> Virt::getListAllDomains(Hypervisor &hypervisor) {
     virDomainPtr *domainList;
 
     int n = virConnectListAllDomains(conn, 
@@ -48,10 +68,13 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor){
     }
 }
 
+
+
 // PUBLIC ======================================================================
 
 
-const Return<const tvirt::MonitoringState &> Virt::getMonitoringState (const DomainID id) {
+const Return<const tvirt::MonitoringState &> 
+Virt::getMonitoringState (const DomainID id) {
   virDomainInfo info;
   if (virDomainGetInfo(reinterpret_cast<virDomainPtr>(id), &info) == -1){
     return Return<const tvirt::MonitoringState &>(false, monitoringState);
@@ -75,7 +98,7 @@ const Return<const tvirt::Hypervisor &> Virt::getHypervisor() {
   hypervisor.mutable_host()->set_name(virConnectGetHostname(conn));
   
   Return <void> r = getListAllDomains (hypervisor);
-  if (!r.success){
+  if (!r.success) {
     return Return<const tvirt::Hypervisor &>(false, hypervisor);
   }
 
@@ -117,17 +140,3 @@ const Return<void> Virt::rebootForceDomain (const DomainID id) {
 } //daemon
   
 } //tvirt
-
-
-
-
-
-
-
-
-
-
-
-
-
-
