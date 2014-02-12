@@ -6,9 +6,9 @@
 #include <string>
 #include <list>
 
-#include "ViewModel.hpp"
 #include "Requester.hpp"
 #include "../../utils/Return.hpp"
+#include "../../proto/Hypervisor.pb.h"
 
 namespace tvirt {
 
@@ -44,10 +44,9 @@ private:
   typedef std::list<HypervisorConnection> Connections;
 
   Connections hypervisorConnections;
-  ViewModel *view;
   
 public:
-  ViewControler(ViewModel *view);
+  ViewControler();
 
   Return<ConnectionID> addConnection    (const std::string &, uint16_t port);
   Return<void>         removeConnection (const std::string &, uint16_t port);

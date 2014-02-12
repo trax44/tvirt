@@ -8,8 +8,7 @@ namespace tvirt {
 namespace master {
 
 
-ViewControler::ViewControler(ViewModel *view) : 
-  view (view){}
+ViewControler::ViewControler() {}
 
 
 Return<ViewControler::ConnectionID> 

@@ -19,7 +19,6 @@
 #include "../Requester.hpp"
 #include "HypervisorConnect.hpp"
 #include "Hypervisor.hpp"
-#include "../ViewModel.hpp"
 #include "../ViewControler.hpp"
 
 namespace tvirt {
@@ -30,8 +29,7 @@ namespace web {
 
 
 
-class WebGUI : public Wt::WApplication ,
-               public ViewModel {
+class WebGUI : public Wt::WApplication  {
 public:
   WebGUI (const Wt::WEnvironment& env);
   ~WebGUI(){std::cout << "life is cruel" << std::endl;}
@@ -56,7 +54,7 @@ private:
 
 WebGUI::WebGUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
-    controler(this) {
+    controler() {
 
   setTitle("Enyx Cloud Administration Tool");
   //useStyleSheet("web/css.css");
