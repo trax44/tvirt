@@ -45,7 +45,7 @@ private:
 
   Wt::WVBoxLayout *globalLayout;
 
-  void handleGuestAction (uint64_t guestID, Hypervisor::Action action);
+  void handleGuestAction (uint64_t guestID, proto::Type action);
 
   void addHypervisor(const std::string address, uint16_t port);
   void removeHypervisorDialog();
@@ -81,7 +81,7 @@ void WebGUI::askForHypervisorConnection(){
   
 }
 
-void WebGUI::handleGuestAction (uint64_t guestID, Hypervisor::Action action){
+void WebGUI::handleGuestAction (uint64_t guestID, proto::Type action){
   // switch (::tvirt::Type::DOMAIN_LIST
 }
 

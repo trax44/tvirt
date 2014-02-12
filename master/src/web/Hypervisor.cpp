@@ -69,9 +69,9 @@ Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
 
     Wt::WPopupMenu *popup = new Wt::WPopupMenu();
 
-    popup->addItem("Boot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), BOOT));
-    popup->addItem("Reboot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), REBOOT));
-    popup->addItem("Send Comamnd")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), SEND_COMMAND));
+    popup->addItem("Start")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_START));
+    popup->addItem("Reboot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_REBOOT));
+    popup->addItem("Send Comamnd")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_SEND_COMMAND));
     
 
     Wt::WPushButton *action = new Wt::WPushButton("Action");
@@ -81,8 +81,8 @@ Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
   }
 }
 
-void Hypervisor::emitAction (uint64_t guestID, Action action) {
-  done_.emit(guestID, action);
+void Hypervisor::emitAction (uint64_t guestID, proto::Type actionType) {
+  done_.emit(guestID, actionType);
 }
 
 const std::string Hypervisor::osName(int i) {

@@ -3,11 +3,12 @@ package tvirt.proto;
 
 
 enum Type {
-  DOMAIN_DESTROY    = 0;
-  DOMAIN_REBOOT     = 1;
-  DOMAIN_START      = 2;
-  DOMAIN_LIST       = 3;
-  DOMAIN_GET_STATE  = 4;
+  DOMAIN_DESTROY      = 0;
+  DOMAIN_REBOOT       = 1;
+  DOMAIN_START        = 2;
+  DOMAIN_LIST         = 3;
+  DOMAIN_GET_STATE    = 4;
+  DOMAIN_SEND_COMMAND = 5;
 }
 
 
