@@ -4,6 +4,7 @@
 #include <Wt/WPanel>
 #include <Wt/WSignal>
 #include "../../../proto/Hypervisor.pb.h"
+#include "../../../proto/Request.pb.h"
 
 namespace tvirt {
 
@@ -13,23 +14,17 @@ namespace web {
 
 class Hypervisor : public Wt::WPanel{
 public:
-  enum Action{
-    BOOT,
-    REBOOT,
-    SEND_COMMAND,
-    REFRESH
-  };
 
 private:
 
   
-  Wt::Signal<uint64_t, Action> done_;
+  Wt::Signal<uint64_t, proto::Type> done_;
 
   const std::string osName(int i);  
-  void emitAction (uint64_t guestID, Action action);
+  void emitAction (uint64_t guestID, proto::Type action);
 public:
   Hypervisor(const ::tvirt::Hypervisor &hypervisor);
-  Wt::Signal<uint64_t, Action>& action() { return done_; }
+  Wt::Signal<uint64_t, proto::Type>& action() { return done_; }
 };
 
 } // web
