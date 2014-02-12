@@ -53,21 +53,21 @@ void printMonitoringState (const tvirt::MonitoringState &monitoringState) {
   std::cout << "IO " << monitoringState.io() << std::endl;
 }
 
-void printBody (const tvirt::Reply &reply,
+void printBody (const proto::Reply &reply,
                  const std::string  &buffer){
 
   switch (reply.type()) {
-  case tvirt::DOMAIN_DESTROY:
-  case tvirt::DOMAIN_REBOOT:
-  case tvirt::DOMAIN_START:
+  case proto::DOMAIN_DESTROY:
+  case proto::DOMAIN_REBOOT:
+  case proto::DOMAIN_START:
     // nothing to do
     break;
-  case tvirt::DOMAIN_LIST:
+  case proto::DOMAIN_LIST:
     {tvirt::Hypervisor hyper;
     hyper.ParseFromString(buffer);
     printHypervisor(hyper);}
     break;
-  case tvirt::DOMAIN_GET_STATE:
+  case proto::DOMAIN_GET_STATE:
     {tvirt::MonitoringState monitoringState;
     monitoringState.ParseFromString(buffer);
     printMonitoringState(monitoringState);}
@@ -79,24 +79,24 @@ void printBody (const tvirt::Reply &reply,
   }
 }
 
-const Return<std::string> printTypeName (const tvirt::Type & type){
+const Return<std::string> printTypeName (const proto::Type & type){
   switch (type) {
-  case tvirt::DOMAIN_DESTROY:
+  case proto::DOMAIN_DESTROY:
     return Return<std::string> (true, "destroy domain");
-  case tvirt::DOMAIN_REBOOT:
+  case proto::DOMAIN_REBOOT:
     return Return<std::string> (true, "reboot domain");
-  case tvirt::DOMAIN_START:
+  case proto::DOMAIN_START:
     return Return<std::string> (true, "start domain");
-  case tvirt::DOMAIN_LIST:
+  case proto::DOMAIN_LIST:
     return Return<std::string> (true, "list domains");
-  case tvirt::DOMAIN_GET_STATE:
+  case proto::DOMAIN_GET_STATE:
     return Return<std::string> (true, "get domain state");
   default:
     return Return<std::string> (false, "Unknown");
   }
 }
 
-void printReply(const tvirt::Reply &reply) {
+void printReply(const proto::Reply &reply) {
   const Return<std::string> r = printTypeName(reply.type());
   std::cout << ((reply.success())?"OK   ":"FAIL ") 
             << r.data

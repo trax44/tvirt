@@ -9,7 +9,7 @@
 namespace tvirt {
 namespace daemon {
 
-
+#warning free libvirt structs in destructor 
     
 Virt::Virt() : 
   conn (NULL){

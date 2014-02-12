@@ -12,13 +12,15 @@ namespace master {
 namespace web {
 
 class Hypervisor : public Wt::WPanel{
-private:
+public:
   enum Action{
     BOOT,
     REBOOT,
     SEND_COMMAND,
     REFRESH
   };
+
+private:
 
   
   Wt::Signal<uint64_t, Action> done_;

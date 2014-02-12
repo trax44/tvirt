@@ -10,11 +10,11 @@
 
 
 
-Return<tvirt::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
-                                     const tvirt::Request   &request,
+Return<tvirt::proto::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
+                                     const tvirt::proto::Request   &request,
                                      std::string *replyBuffer){
   
-  tvirt::Reply replyHeader;
+  tvirt::proto::Reply replyHeader;
   std::string buffer;
   request.SerializeToString(&buffer);
   
@@ -35,11 +35,11 @@ Return<tvirt::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
     Return<int> retBody = requester.recv(replyBuffer);
     if (retBody.data == -1 || retBody.success){
       std::cout << "Body " << retBody.data << ":" << retBody.success << std::endl;
-      return Return<tvirt::Reply>(false, replyHeader);
+      return Return<tvirt::proto::Reply>(false, replyHeader);
     }
   } 
 
-  return Return<tvirt::Reply>(true, replyHeader);
+  return Return<tvirt::proto::Reply>(true, replyHeader);
 }
 
 void printGuest (const tvirt::Guest &guest){
@@ -88,21 +88,21 @@ void printMonitoringState (const tvirt::MonitoringState &monitoringState) {
   std::cout << "IO " << monitoringState.io() << std::endl;
 }
 
-void printBody (const tvirt::Reply &reply,
+void printBody (const tvirt::proto::Reply &reply,
                  const std::string  &buffer){
 
   switch (reply.type()) {
-  case tvirt::DOMAIN_DESTROY:
-  case tvirt::DOMAIN_REBOOT:
-  case tvirt::DOMAIN_START:
+  case tvirt::proto::DOMAIN_DESTROY:
+  case tvirt::proto::DOMAIN_REBOOT:
+  case tvirt::proto::DOMAIN_START:
     // nothing to do
     break;
-  case tvirt::DOMAIN_LIST:
+  case tvirt::proto::DOMAIN_LIST:
     {tvirt::Hypervisor hyper;
     hyper.ParseFromString(buffer);
     printHypervisor(hyper);}
     break;
-  case tvirt::DOMAIN_GET_STATE:
+  case tvirt::proto::DOMAIN_GET_STATE:
     {tvirt::MonitoringState monitoringState;
     monitoringState.ParseFromString(buffer);
     printMonitoringState(monitoringState);}
@@ -114,24 +114,24 @@ void printBody (const tvirt::Reply &reply,
   }
 }
 
-const Return<std::string> printTypeName (const tvirt::Type & type){
+const Return<std::string> printTypeName (const tvirt::proto::Type & type){
   switch (type) {
-  case tvirt::DOMAIN_DESTROY:
+  case tvirt::proto::DOMAIN_DESTROY:
     return Return<std::string> (true, "destroy domain");
-  case tvirt::DOMAIN_REBOOT:
+  case tvirt::proto::DOMAIN_REBOOT:
     return Return<std::string> (true, "reboot domain");
-  case tvirt::DOMAIN_START:
+  case tvirt::proto::DOMAIN_START:
     return Return<std::string> (true, "start domain");
-  case tvirt::DOMAIN_LIST:
+  case tvirt::proto::DOMAIN_LIST:
     return Return<std::string> (true, "list domains");
-  case tvirt::DOMAIN_GET_STATE:
+  case tvirt::proto::DOMAIN_GET_STATE:
     return Return<std::string> (true, "get domain state");
   default:
     return Return<std::string> (false, "Unknown");
   }
 }
 
-void printReply(const tvirt::Reply &reply) {
+void printReply(const tvirt::proto::Reply &reply) {
   const Return<std::string> r = printTypeName(reply.type());
   std::cout << ((reply.success())?"OK   ":"FAIL ") 
             << r.data
@@ -150,7 +150,7 @@ void *sub (void *socket_){
   std::string replyBuffer;
   std::string bodyBuffer;
 
-  tvirt::Reply reply;
+  tvirt::proto::Reply reply;
   while (ok){
     Return<int> r = socket->recv(&replyBuffer);
     reply.ParseFromString(replyBuffer);
@@ -183,11 +183,11 @@ int main(int argc, char *argv[]) {
   pthread_create(&subThread, NULL, sub, &n);
 
   std::string buffer;
-  tvirt::Request request;
+  tvirt::proto::Request request;
   
   // request domain list 
-  request.set_type(tvirt::DOMAIN_LIST);
-  Return<tvirt::Reply> ret = executeCommand(requester, request, &buffer);
+  request.set_type(tvirt::proto::DOMAIN_LIST);
+  Return<tvirt::proto::Reply> ret = executeCommand(requester, request, &buffer);
   if (!ret.success){
     return -1;
   }
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0 , e = hypervisor.guests_size(); i < e ; i++){
     if (!hypervisor.guests(i).active()){
       buffer.clear();
-      request.set_type(tvirt::DOMAIN_START);
+      request.set_type(tvirt::proto::DOMAIN_START);
       request.set_domainid(hypervisor.guests(i).id());
       executeCommand(requester, request, &buffer);
     }
@@ -218,9 +218,9 @@ int main(int argc, char *argv[]) {
   if (hypervisor.guests_size() > 0){
     std::cout << "Asking for guest info" << std::endl;
     // request guest monitoring state 
-    request.set_type(tvirt::DOMAIN_GET_STATE);
+    request.set_type(tvirt::proto::DOMAIN_GET_STATE);
     request.set_domainid(hypervisor.guests(0).id());
-    Return<tvirt::Reply> ret = executeCommand(requester, request, &buffer);
+    Return<tvirt::proto::Reply> ret = executeCommand(requester, request, &buffer);
     if (!ret.success){
       std::cout << "Failed to retrieve information" << std::endl;
       return -1;

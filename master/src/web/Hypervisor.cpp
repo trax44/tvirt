@@ -69,9 +69,9 @@ Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
 
     Wt::WPopupMenu *popup = new Wt::WPopupMenu();
 
-    popup->addItem("Boot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, 1, BOOT));
-    popup->addItem("Reboot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, 1, REBOOT));
-    popup->addItem("Send Comamnd")->triggered().connect(std::bind (&Hypervisor::emitAction, this, 1, SEND_COMMAND));
+    popup->addItem("Boot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), BOOT));
+    popup->addItem("Reboot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), REBOOT));
+    popup->addItem("Send Comamnd")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), SEND_COMMAND));
     
 
     Wt::WPushButton *action = new Wt::WPushButton("Action");

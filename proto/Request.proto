@@ -1,4 +1,6 @@
-package tvirt;
+package tvirt.proto;
+
+
 
 enum Type {
   DOMAIN_DESTROY    = 0;
@@ -11,10 +13,13 @@ enum Type {
 
 message Request{
 
-  required Type     type       = 1;
-  optional int64    requestID  = 2;
-  optional fixed64  domainID   = 3;
-  optional string   domainName = 4;
+  optional int64    requestID  = 1;
+  optional fixed64  domainID   = 2;
+  optional string   domainName = 3;
+
+  
+  required Type     type       = 4;
+
 }
 
 

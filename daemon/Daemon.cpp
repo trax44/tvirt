@@ -19,28 +19,28 @@ Daemon::Daemon(const std::string &address,
 }
 
 
-Return<void> Daemon::execute(const Request & request,
+Return<void> Daemon::execute(const proto::Request & request,
                              std::string *serializedAnswer){
 #warning clean ret vs return 
   Return<void> ret = true; 
   std::cout << "executing command " << std::endl;
   
   switch(request.type()){
-  case DOMAIN_DESTROY:
+  case proto::DOMAIN_DESTROY:
     if (!request.has_domainid()){
       return false;
     }
     ret =  virt.rebootForceDomain(request.domainid());
     break;
 
-  case DOMAIN_REBOOT:
+  case proto::DOMAIN_REBOOT:
     if (!request.has_domainid()){
       return false;
     }
     ret =  virt.rebootDomain(request.domainid());
     break;
 
-  case DOMAIN_START:
+  case proto::DOMAIN_START:
     if (!request.has_domainid()){
       return false;
     }
@@ -48,7 +48,7 @@ Return<void> Daemon::execute(const Request & request,
             true:false);
     break;
 
-  case DOMAIN_LIST:
+  case proto::DOMAIN_LIST:
     {
       const Return<const Hypervisor &>hypervisor = virt.getHypervisor();
       if (hypervisor.success){
@@ -59,7 +59,7 @@ Return<void> Daemon::execute(const Request & request,
       }
     }
     break;
-  case DOMAIN_GET_STATE:
+  case proto::DOMAIN_GET_STATE:
     {
       if (!request.has_domainid()){
         return false;
@@ -86,14 +86,14 @@ void Daemon::handlerRequest(){
   
   bool ok = true;
 
-  Reply replyHeader;
+  proto::Reply replyHeader;
   std::string replyHeaderBuffer;
 
   std::string replyBodyBuffer;
 
 
   std::string requestBuffer;
-  Request request;
+  proto::Request request;
   while (ok) {
     requestBuffer.clear();
     Return<int> r = replyer.recv(&requestBuffer);

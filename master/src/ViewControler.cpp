@@ -17,7 +17,7 @@ ViewControler::addConnection (const std::string &address,
                               uint16_t port) {
 
   
-  
+  /// \TODO use find_if 
   for (Connections::const_iterator 
          i = hypervisorConnections.begin() , 
          e = hypervisorConnections.end() ;
@@ -47,7 +47,9 @@ ViewControler::addConnection (const std::string &address,
   return id;
 }
 
-
+// Return<void> ViewControler::doActionOnGuest(){
+  
+// }
 
 
 Return<Hypervisor> ViewControler::connectToHypervisor(const ConnectionID connectionID){
@@ -57,10 +59,10 @@ Return<Hypervisor> ViewControler::connectToHypervisor(const ConnectionID connect
   }
 
   std::string buffer;
-  tvirt::Request request;
+  proto::Request request;
 
-  request.set_type(tvirt::DOMAIN_LIST);
-  Return <Reply> reply = r.data->requester.executeCommand(request, &buffer);
+  request.set_type(proto::DOMAIN_LIST);
+  Return <proto::Reply> reply = r.data->requester.executeCommand(request, &buffer);
 
   if (!reply.success){
     return false;

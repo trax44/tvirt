@@ -34,6 +34,7 @@ class WebGUI : public Wt::WApplication ,
                public ViewModel {
 public:
   WebGUI (const Wt::WEnvironment& env);
+  ~WebGUI(){std::cout << "life is cruel" << std::endl;}
 
 private:
   ViewControler controler;
@@ -42,7 +43,9 @@ private:
   std::list<Requester> hypervisorsConnection;
   HypervisorConnect *hypervisorConnection;
 
-  Wt::WVBoxLayout globalLayout;
+  Wt::WVBoxLayout *globalLayout;
+
+  void handleGuestAction (uint64_t guestID, Hypervisor::Action action);
 
   void addHypervisor(const std::string address, uint16_t port);
   void removeHypervisorDialog();
@@ -57,8 +60,8 @@ WebGUI::WebGUI(const Wt::WEnvironment& env)
 
   setTitle("Enyx Cloud Administration Tool");
   //useStyleSheet("web/css.css");
-  
-  root()->setLayout(&globalLayout);
+  globalLayout = new Wt::WVBoxLayout();
+  root()->setLayout(globalLayout);
   askForHypervisorConnection();
   setTheme(new Wt::WBootstrapTheme());
   //setCssTheme("polished");
@@ -67,7 +70,7 @@ WebGUI::WebGUI(const Wt::WEnvironment& env)
 void WebGUI::removeHypervisorDialog(){
   std::cout << "hyp res " << hypervisorConnection->result() << std::endl;
 
-  delete hypervisorConnection;
+  //delete hypervisorConnection;
   hypervisorConnection = NULL;
 }
 
@@ -78,6 +81,9 @@ void WebGUI::askForHypervisorConnection(){
   
 }
 
+void WebGUI::handleGuestAction (uint64_t guestID, Hypervisor::Action action){
+  // switch (::tvirt::Type::DOMAIN_LIST
+}
 
 void WebGUI::addHypervisor(const std::string address, uint16_t port) {
   std::cout << "checking hypervision connection information" << std::endl;
@@ -89,8 +95,10 @@ void WebGUI::addHypervisor(const std::string address, uint16_t port) {
       return;
     }
     
-    globalLayout.addWidget(new web::Hypervisor(r.data), 0);
-    globalLayout.addWidget(new Wt::WText(""), 1);
+    web::Hypervisor *hypervisor = new web::Hypervisor (r.data);
+    hypervisor->action().connect(this, &WebGUI::handleGuestAction);
+    globalLayout->addWidget(hypervisor, 0);
+    globalLayout->addWidget(new Wt::WText(""), 1);
     
   } else {
     Wt::WMessageBox * notification = 
