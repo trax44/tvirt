@@ -3,6 +3,7 @@
 
 #include <Wt/WPanel>
 #include <Wt/WSignal>
+#include "../ViewControler.hpp"
 #include "../../../proto/Hypervisor.pb.h"
 #include "../../../proto/Request.pb.h"
 
@@ -17,14 +18,21 @@ public:
 
 private:
 
-  
-  Wt::Signal<uint64_t, proto::Type> done_;
+  const ViewControler::ConnectionID connectionID;
+  Wt::Signal<const ViewControler::ConnectionID, 
+             const uint64_t, 
+             const proto::Type> done_;
 
   const std::string osName(int i);  
-  void emitAction (uint64_t guestID, proto::Type action);
+  void emitAction (const ViewControler::ConnectionID,
+                   const uint64_t guestID, 
+                   const proto::Type action);
 public:
-  Hypervisor(const ::tvirt::Hypervisor &hypervisor);
-  Wt::Signal<uint64_t, proto::Type>& action() { return done_; }
+  Hypervisor(const ViewControler::ConnectionID connectionID, 
+             const ::tvirt::Hypervisor &hypervisor);
+  Wt::Signal<const ViewControler::ConnectionID, 
+             const uint64_t, 
+             const proto::Type>& action() { return done_; }
 };
 
 } // web

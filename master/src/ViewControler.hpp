@@ -9,6 +9,7 @@
 #include "Requester.hpp"
 #include "../../utils/Return.hpp"
 #include "../../proto/Hypervisor.pb.h"
+#include "../../proto/Request.pb.h"
 
 namespace tvirt {
 
@@ -56,6 +57,9 @@ public:
   getConnection(const ConnectionID connectionID);
   
   Return<Hypervisor>         connectToHypervisor(const ConnectionID connectionID);
+  Return<void>               doActionOnGuest(const ConnectionID connectionID,
+                                             const uint64_t guestID,
+                                             const proto::Type actionType);
 };
 
 } // master

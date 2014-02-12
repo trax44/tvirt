@@ -80,7 +80,7 @@ Virt::getMonitoringState (const DomainID id) {
     return Return<const tvirt::MonitoringState &>(false, monitoringState);
   }
   
-  monitoringState.set_guestid(id);
+  monitoringState.set_guestid(reinterpret_cast<uint64_t>(id));
   monitoringState.mutable_cpu()->set_nbcpu(info.nrVirtCpu);
   monitoringState.mutable_cpu()->set_time(info.cpuTime);
   monitoringState.mutable_memory()->set_used(info.memory);
@@ -105,13 +105,7 @@ const Return<const tvirt::Hypervisor &> Virt::getHypervisor() {
   return hypervisor;
 }
 
-const Return<void> Virt::rebootDomain (const DomainID id) {
-  virDomainPtr domainPtr;
-
-  if ((domainPtr = virDomainLookupByID (conn, id)) == NULL){
-    return false;
-  }
-  
+const Return<void> Virt::rebootDomain (const DomainID domainPtr) {
   if (virDomainReboot(domainPtr, VIR_DOMAIN_REBOOT_DEFAULT) == 0){
     return true;
   } else {
@@ -121,13 +115,33 @@ const Return<void> Virt::rebootDomain (const DomainID id) {
 }
 
 
-const Return<void> Virt::rebootForceDomain (const DomainID id) {
-  virDomainPtr domainPtr;
+const Return<void> Virt::startDomain (const DomainID domainPtr) {
 
-  if ((domainPtr = virDomainLookupByID (conn, id)) == NULL){
+  if (virDomainCreate(domainPtr) == 0){
+    return true;
+  } else {
     return false;
   }
   
+}
+
+
+const Return<void> Virt::stopDomain (const DomainID domainPtr) {
+
+  if (virDomainShutdownFlags(domainPtr, 
+                             VIR_DOMAIN_SHUTDOWN_ACPI_POWER_BTN	|
+                             VIR_DOMAIN_SHUTDOWN_GUEST_AGENT    |
+                             VIR_DOMAIN_SHUTDOWN_INITCTL        | 
+                             VIR_DOMAIN_SHUTDOWN_SIGNAL) == 0){
+    return true;
+  } else {
+    return false;
+  }
+  
+}
+
+const Return<void> Virt::destroyDomain (const DomainID domainPtr) {
+
   if (virDomainDestroy(domainPtr) == 0){
     return true;
   } else {

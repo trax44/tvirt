@@ -43,7 +43,9 @@ private:
 
   Wt::WVBoxLayout *globalLayout;
 
-  void handleGuestAction (uint64_t guestID, proto::Type action);
+  void handleGuestAction (const ViewControler::ConnectionID connectionID, 
+                          const uint64_t guestID, 
+                          const proto::Type action);
 
   void addHypervisor(const std::string address, uint16_t port);
   void removeHypervisorDialog();
@@ -79,8 +81,11 @@ void WebGUI::askForHypervisorConnection(){
   
 }
 
-void WebGUI::handleGuestAction (uint64_t guestID, proto::Type action){
-  // switch (::tvirt::Type::DOMAIN_LIST
+void WebGUI::handleGuestAction (const ViewControler::ConnectionID connectionID, 
+                                const uint64_t guestID, 
+                                const proto::Type action){
+
+  controler.doActionOnGuest(connectionID, guestID, action);
 }
 
 void WebGUI::addHypervisor(const std::string address, uint16_t port) {
@@ -93,7 +98,7 @@ void WebGUI::addHypervisor(const std::string address, uint16_t port) {
       return;
     }
     
-    web::Hypervisor *hypervisor = new web::Hypervisor (r.data);
+    web::Hypervisor *hypervisor = new web::Hypervisor (connection.data, r.data);
     hypervisor->action().connect(this, &WebGUI::handleGuestAction);
     globalLayout->addWidget(hypervisor, 0);
     globalLayout->addWidget(new Wt::WText(""), 1);
