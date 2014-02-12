@@ -30,22 +30,25 @@ Return<void> Daemon::execute(const proto::Request & request,
     if (!request.has_domainid()){
       return false;
     }
-    ret =  virt.rebootForceDomain(request.domainid());
+    ret =  virt.stopDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
+    serializedAnswer->clear();
     break;
 
   case proto::DOMAIN_REBOOT:
     if (!request.has_domainid()){
       return false;
     }
-    ret =  virt.rebootDomain(request.domainid());
+    ret =  virt.rebootDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
+    serializedAnswer->clear();
     break;
 
   case proto::DOMAIN_START:
     if (!request.has_domainid()){
       return false;
     }
-    return ((virDomainCreate(reinterpret_cast<virDomainPtr>(request.domainid())) == 0)?
-            true:false);
+    serializedAnswer->clear();
+    ret =  virt.startDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
+    serializedAnswer->clear();
     break;
 
   case proto::DOMAIN_LIST:
@@ -65,7 +68,7 @@ Return<void> Daemon::execute(const proto::Request & request,
         return false;
       }
       const Return<const MonitoringState &> monitoringState = 
-        virt.getMonitoringState(request.domainid());
+        virt.getMonitoringState(reinterpret_cast<virDomainPtr>(request.domainid()));
       if (!monitoringState.success) {
         return false;
       }
@@ -132,7 +135,7 @@ void Daemon::handlerRequest(){
     }
     
 
-    if (execReturn.success) {
+    if ((replyHeaderBuffer.size() > 0)) {
       Return<int>  sendReturn = replyer.send(replyBodyBuffer, false);
     }
   }

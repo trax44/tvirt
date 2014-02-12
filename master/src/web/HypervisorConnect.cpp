@@ -13,25 +13,28 @@ HypervisorConnect::HypervisorConnect():Wt::WDialog("Connection"),
                                        done_(this){
 
   setStyleClass("dialog");
-    
+  wtAddress = new Wt::WLineEdit(); wtAddress->setId("address");
+  wtPort    = new Wt::WLineEdit(); wtPort->setId("port");
 
 
   Wt::WPushButton *ok = new Wt::WPushButton("OK", footer());
+  ok->setId("OK");
   ok->setDefault(true);
 
   Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", footer());
+  cancel->setId("CANCEL");
   rejectWhenEscapePressed();
   
   ok->clicked().connect(this, &HypervisorConnect::validate);
 
   Wt::WVBoxLayout *vbox = new Wt::WVBoxLayout(this->contents());
   vbox->addWidget(new Wt::WText("Address"));
-  vbox->addWidget(&wtAddress);
+  vbox->addWidget(wtAddress);
   vbox->addWidget(new Wt::WText("Port"));
-  vbox->addWidget(&wtPort);
+  vbox->addWidget(wtPort);
   
   validator.setMandatory(true);
-  wtPort.setValidator(&validator);
+  wtPort->setValidator(&validator);
 
   setOffsets(0, Wt::Top);
   animateShow
@@ -46,7 +49,7 @@ HypervisorConnect::HypervisorConnect():Wt::WDialog("Connection"),
 void HypervisorConnect::validate() {
   
   std::cout << "sending signal" << std::endl;
-  done_.emit(wtAddress.text().toUTF8(), atoi(wtPort.text().toUTF8().c_str()));
+  done_.emit(wtAddress->text().toUTF8(), atoi(wtPort->text().toUTF8().c_str()));
 
   accept();
 }

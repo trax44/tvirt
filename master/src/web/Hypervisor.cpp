@@ -13,7 +13,9 @@ namespace master {
 namespace web {
 
 
-Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
+Hypervisor::Hypervisor(const ViewControler::ConnectionID connectionID,
+                       const ::tvirt::Hypervisor &hypervisor):
+  connectionID(connectionID) {
 
   setTitle(hypervisor.host().name());
   setCollapsible(true);
@@ -69,9 +71,32 @@ Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
 
     Wt::WPopupMenu *popup = new Wt::WPopupMenu();
 
-    popup->addItem("Start")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_START));
-    popup->addItem("Reboot")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_REBOOT));
-    popup->addItem("Send Comamnd")->triggered().connect(std::bind (&Hypervisor::emitAction, this, hypervisor.guests(i).id(), proto::Type::DOMAIN_SEND_COMMAND));
+    popup->addItem("Start")->
+      triggered().connect(std::bind (&Hypervisor::emitAction, 
+                                     this,
+                                     connectionID,
+                                     hypervisor.guests(i).id(), 
+                                     proto::Type::DOMAIN_START));
+    popup->addItem("Halt")->
+      triggered().connect(std::bind (&Hypervisor::emitAction, 
+                                     this,
+                                     connectionID,
+                                     hypervisor.guests(i).id(), 
+                                     proto::Type::DOMAIN_DESTROY));
+    
+    popup->addItem("Reboot")->
+      triggered().connect(std::bind (&Hypervisor::emitAction, 
+                                     this, 
+                                     connectionID,
+                                     hypervisor.guests(i).id(), 
+                                     proto::Type::DOMAIN_REBOOT));
+    
+    // popup->addItem("Send Comamnd")->
+    //   triggered().connect(std::bind (&Hypervisor::emitAction, 
+    //                                  this, 
+    //                                  connectionID,
+    //                                  hypervisor.guests(i).id(), 
+    //                                  proto::Type::DOMAIN_SEND_COMMAND));
     
 
     Wt::WPushButton *action = new Wt::WPushButton("Action");
@@ -81,8 +106,10 @@ Hypervisor::Hypervisor(const ::tvirt::Hypervisor &hypervisor) {
   }
 }
 
-void Hypervisor::emitAction (uint64_t guestID, proto::Type actionType) {
-  done_.emit(guestID, actionType);
+void Hypervisor::emitAction (const ViewControler::ConnectionID connectionID, 
+                             const uint64_t guestID, 
+                             const proto::Type actionType) {
+  done_.emit(connectionID, guestID, actionType);
 }
 
 const std::string Hypervisor::osName(int i) {

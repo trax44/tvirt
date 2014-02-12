@@ -22,8 +22,8 @@ namespace web {
 
 class HypervisorConnect : public Wt::WDialog {
 private:
-  Wt::WLineEdit        wtAddress;
-  Wt::WLineEdit        wtPort;
+  Wt::WLineEdit        *wtAddress;
+  Wt::WLineEdit        *wtPort;
   Wt::WIntValidator    validator;
 
   void connect();
@@ -44,3 +44,6 @@ public:
 } // tvirt
 
 #endif /* TVIRT_MASTER_WEB */
+
+
+

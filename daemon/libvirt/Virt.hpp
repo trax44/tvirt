@@ -15,7 +15,7 @@ namespace daemon {
     
 class Virt {
 public:
-  typedef int DomainID;
+  typedef virDomainPtr DomainID;
 
 private:
   
@@ -37,9 +37,12 @@ public:
                                                           const virDomainPtr domainPtr);
 
   const Return<const Hypervisor&>      getHypervisor     ();
-  const Return<const MonitoringState&> getMonitoringState(const DomainID id);
-  const Return<void>                   rebootDomain      (const DomainID id);
-  const Return<void>                   rebootForceDomain (const DomainID id);
+  const Return<const MonitoringState&> getMonitoringState(const DomainID domainPtr);
+  const Return<void>                   start             (const DomainID domainPtr);
+  const Return<void>                   rebootDomain      (const DomainID domainPtr);
+  const Return<void>                   startDomain       (const DomainID domainPtr);
+  const Return<void>                   stopDomain        (const DomainID domainPtr);
+  const Return<void>                   destroyDomain     (const DomainID domainPtr);
 };
 
     
