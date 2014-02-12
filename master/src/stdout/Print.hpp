@@ -14,15 +14,15 @@ namespace master {
 
 namespace stdout {
 
-void printGuest (const tvirt::Guest &guest);
-void printHypervisor(const tvirt::Hypervisor &hypervisor);
-void printCPU(const tvirt::CPU &cpu);
-void printMemory (const tvirt::Memory &memory);
-void printMonitoringState (const tvirt::MonitoringState &monitoringState);
-void printBody (const tvirt::Reply &reply,
+void printGuest (const Guest &guest);
+void printHypervisor(const Hypervisor &hypervisor);
+void printCPU(const CPU &cpu);
+void printMemory (const Memory &memory);
+void printMonitoringState (const MonitoringState &monitoringState);
+void printBody (const proto::Reply &reply,
                 const std::string  &buffer);
-const Return<std::string> printTypeName (const tvirt::Type & type);
-void printReply(const tvirt::Reply &reply);
+const Return<std::string> printTypeName (const proto::Type & type);
+void printReply(const proto::Reply &reply);
 
 
 } // stdout

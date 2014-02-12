@@ -10,10 +10,10 @@ Requester::Requester(const std::string &address,
 
 
 
-Return<tvirt::Reply> Requester::executeCommand (const tvirt::Request &request,
+Return<proto::Reply> Requester::executeCommand (const proto::Request &request,
                                                 std::string *replyBuffer) {
   
-  tvirt::Reply replyHeader;
+  proto::Reply replyHeader;
   std::string buffer;
   request.SerializeToString(&buffer);
   
@@ -31,11 +31,11 @@ Return<tvirt::Reply> Requester::executeCommand (const tvirt::Request &request,
   if (ret.success){
     Return<int> retBody = socket.recv(replyBuffer);
     if (retBody.data == -1 || retBody.success) {
-      return Return<tvirt::Reply>(false, replyHeader);
+      return Return<proto::Reply>(false, replyHeader);
     }
   }
 
-  return Return<tvirt::Reply>(true, replyHeader);
+  return Return<proto::Reply>(true, replyHeader);
 }
 
 

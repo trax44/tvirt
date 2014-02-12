@@ -21,7 +21,7 @@ private:
   tvirt::comm::ServerZmq publisher;  
   tvirt::comm::ServerZmq replyer;  
 
-  Return<void> execute(const Request &request,
+  Return<void> execute(const proto::Request &request,
                        std::string *ret);
 public:
   Daemon(const std::string &address, 

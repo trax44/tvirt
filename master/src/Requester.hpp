@@ -18,7 +18,7 @@ namespace master {
 class Requester {
 private:
   comm::ClientZmq socket;
-  tvirt::Reply replyHeader;
+  proto::Reply replyHeader;
   std::string buffer;
 
 public:
@@ -26,8 +26,8 @@ public:
             const uint16_t port);
 
 
-  Return<Reply> executeCommand (const tvirt::Request &request,
-                                std::string *replyBuffer);
+  Return<proto::Reply> executeCommand (const proto::Request &request,
+                                       std::string *replyBuffer);
   
   
 
