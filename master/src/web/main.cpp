@@ -15,6 +15,9 @@
 #include <Wt/WBootstrapTheme>
 #include <Wt/WTable>
 #include <Wt/WText>
+#include <Wt/WNavigationBar>
+#include <Wt/WMenu>
+#include <Wt/WStackedWidget>
 
 #include "../Requester.hpp"
 #include "HypervisorConnect.hpp"
@@ -47,24 +50,66 @@ private:
                           const uint64_t guestID, 
                           const proto::Type action);
 
+
+  Wt::WNavigationBar * createNavigationBar(Wt::WStackedWidget *stack, Wt::WContainerWidget *parent=0);
   void addHypervisor(const std::string address, uint16_t port);
   void removeHypervisorDialog();
   void askForHypervisorConnection();
 };
 
+Wt::WWidget* createNotification(const std::string & text){
 
+  Wt::WTemplate *t = new Wt::WTemplate(Wt::WString::tr(text));
+  return t;
+}
+
+
+Wt::WNavigationBar * WebGUI::createNavigationBar(Wt::WStackedWidget *stack, Wt::WContainerWidget *parent) {
+  Wt::WNavigationBar * navigation = new Wt::WNavigationBar(parent);
+  navigation->setTitle("Tvirt");
+  navigation->setResponsive(true);
+
+  Wt::WMenu *leftMenu = new Wt::WMenu(stack, parent);
+  leftMenu->addItem("Home", new Wt::WText ("Welcome home"));
+  leftMenu->addItem("Hypervisors", new Wt::WText("Managing hypervisor"))->triggered().connect(this, &WebGUI::askForHypervisorConnection);
+
+  auto notification = new Wt::WText("trax Omar Giveranud o.givernaud@gmail.com");
+  notification->setStyleClass("alert alert-info");
+
+  leftMenu->addItem("About", notification);
+  
+  navigation->addMenu(leftMenu);
+
+  Wt::WLineEdit *edit = new Wt::WLineEdit();
+  navigation->addSearch(edit, Wt::AlignRight);
+
+  return navigation;
+}
 
 WebGUI::WebGUI(const Wt::WEnvironment& env)
   : Wt::WApplication(env),
     controler() {
 
-  setTitle("Enyx Cloud Administration Tool");
-  //useStyleSheet("web/css.css");
+  setTitle("Enyx Cloud Administration Tool" __TIME__);
+
+
+
+  useStyleSheet("web/css.css");
   globalLayout = new Wt::WVBoxLayout();
   root()->setLayout(globalLayout);
-  askForHypervisorConnection();
+  //askForHypervisorConnection();
   setTheme(new Wt::WBootstrapTheme());
   //setCssTheme("polished");
+
+  root()->setStyleClass("row-fluid");
+  
+  auto menuStack  = new Wt::WStackedWidget(root()); 
+  auto navBar     = createNavigationBar(menuStack, root());
+  globalLayout->addWidget(navBar,0);
+  globalLayout->addWidget(menuStack,0);
+
+  globalLayout->addStretch(1);
+
 }
 
 void WebGUI::removeHypervisorDialog(){
@@ -100,8 +145,8 @@ void WebGUI::addHypervisor(const std::string address, uint16_t port) {
     
     web::Hypervisor *hypervisor = new web::Hypervisor (connection.data, r.data);
     hypervisor->action().connect(this, &WebGUI::handleGuestAction);
-    globalLayout->addWidget(hypervisor, 0);
-    globalLayout->addWidget(new Wt::WText(""), 1);
+    globalLayout->insertWidget(globalLayout->count() - 1, hypervisor, 0);
+    
     
   } else {
     Wt::WMessageBox * notification = 
