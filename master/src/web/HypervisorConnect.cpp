@@ -13,8 +13,8 @@ HypervisorConnect::HypervisorConnect():Wt::WDialog("Connection"),
                                        done_(this){
 
   setStyleClass("dialog");
-  wtAddress = new Wt::WLineEdit(); wtAddress->setId("address");
-  wtPort    = new Wt::WLineEdit(); wtPort->setId("port");
+  wtAddress = new Wt::WLineEdit(contents()); 
+  wtPort    = new Wt::WLineEdit(contents()); 
 
 
   Wt::WPushButton *ok = new Wt::WPushButton("OK", footer());
