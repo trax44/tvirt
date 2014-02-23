@@ -47,7 +47,7 @@ void Virt::setGuest(Guest *guest, const virDomainPtr domainPtr) {
 }
 
 Return<void> Virt::getListAllDomains(Hypervisor &hypervisor) {
-    virDomainPtr *domainList;
+  virDomainPtr *domainList;
 
     int n = virConnectListAllDomains(conn, 
                                      &domainList,
@@ -130,9 +130,8 @@ const Return<void> Virt::stopDomain (const DomainID domainPtr) {
 
   if (virDomainShutdownFlags(domainPtr, 
                              VIR_DOMAIN_SHUTDOWN_ACPI_POWER_BTN	|
-                             VIR_DOMAIN_SHUTDOWN_GUEST_AGENT    |
-                             VIR_DOMAIN_SHUTDOWN_INITCTL        | 
-                             VIR_DOMAIN_SHUTDOWN_SIGNAL) == 0){
+                             VIR_DOMAIN_SHUTDOWN_GUEST_AGENT
+                             ) == 0){
     return true;
   } else {
     return false;

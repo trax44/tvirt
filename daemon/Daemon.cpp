@@ -23,14 +23,17 @@ Return<void> Daemon::execute(const proto::Request & request,
                              std::string *serializedAnswer){
 #warning clean ret vs return 
   Return<void> ret = true; 
-  std::cout << "executing command " << std::endl;
+  std::cout << "executing command " 
+            << request.type()
+            << std::endl;
+
   
   switch(request.type()){
   case proto::DOMAIN_DESTROY:
     if (!request.has_domainid()){
       return false;
     }
-    ret =  virt.stopDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
+    ret =  virt.destroyDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
     serializedAnswer->clear();
     break;
 
@@ -116,7 +119,7 @@ void Daemon::handlerRequest(){
     Return<void> execReturn = execute(request, &replyBodyBuffer);
 
     if (!execReturn.success) {
-      std::cout << "failed to execute command" << std::endl;
+      std::cout << "failed to execute command " << request.type() << std::endl;
     }
 
     replyHeader.set_type(request.type());

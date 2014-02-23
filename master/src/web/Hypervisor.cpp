@@ -90,6 +90,13 @@ Hypervisor::Hypervisor(const ViewControler::ConnectionID connectionID,
                                      connectionID,
                                      hypervisor.guests(i).id(), 
                                      proto::Type::DOMAIN_REBOOT));
+
+    popup->addItem("Destroy")->
+      triggered().connect(std::bind (&Hypervisor::emitAction, 
+                                     this, 
+                                     connectionID,
+                                     hypervisor.guests(i).id(), 
+                                     proto::Type::DOMAIN_DESTROY));
     
     // popup->addItem("Send Comamnd")->
     //   triggered().connect(std::bind (&Hypervisor::emitAction, 
