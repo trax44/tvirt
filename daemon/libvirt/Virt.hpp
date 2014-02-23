@@ -18,13 +18,23 @@ public:
   typedef virDomainPtr DomainID;
 
 private:
-  
+
+  pthread_t callBackThread;
   virConnectPtr conn; 
 
   tvirt::Hypervisor         hypervisor;
   tvirt::MonitoringState    monitoringState;
-  Return<void> getListAllDomains(Hypervisor &hypervisor);
+  static volatile bool      pollEvent;
 
+  Return<void> getListAllDomains (Hypervisor &hypervisor);
+
+  static void *callbackLoopStatic(void *me);
+  void        *callbackLoop      ();
+  static int   callbackEvent     (virConnectPtr conn,
+                                  virDomainPtr dom,
+                                  int event,
+                                  int detail,
+                                  void * opaque);
 public:
   Virt();
   // Return<List> getListInactiveVm();

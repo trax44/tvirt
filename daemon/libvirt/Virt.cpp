@@ -2,7 +2,11 @@
 #include <libvirt/libvirt.h>
 #include <stdexcept>
 	
+#include <memory>
 #include <string>
+
+#include <pthread.h>
+
 #include "Virt.hpp"
 
 
@@ -11,6 +15,9 @@ namespace daemon {
 
 #warning free libvirt structs in destructor 
     
+volatile bool Virt::pollEvent = true;
+
+
 Virt::Virt() : 
   conn (NULL){
 
@@ -18,8 +25,66 @@ Virt::Virt() :
   if ((conn = virConnectOpen(NULL)) == NULL) {
     throw std::runtime_error ("Failed to connect to hypervisor");
   }
+
+
+  if (virEventRegisterDefaultImpl()){
+    throw std::runtime_error("Could not register default event loop");
+  }
+
+
+  virDomainPtr *domainList;
+
+  int n = virConnectListAllDomains(conn, 
+                                   &domainList,
+                                   VIR_CONNECT_LIST_DOMAINS_ACTIVE 
+                                   |VIR_CONNECT_LIST_DOMAINS_INACTIVE);
+  
+    
+
+  if (virConnectDomainEventRegisterAny	
+      (conn,
+       NULL,
+       VIR_DOMAIN_EVENT_ID_LIFECYCLE,
+       VIR_DOMAIN_EVENT_CALLBACK(&Virt::callbackEvent),
+       this,
+       NULL) == -1){
+    throw std::runtime_error("Failed to register callback");
+  }
+    
+  
+  pthread_create(&callBackThread, NULL, 
+                 &Virt::callbackLoopStatic, static_cast<void*>(this));
+
 }
 
+void *Virt::callbackLoopStatic (void *me){
+  static_cast<Virt*>(me)->callbackLoop();
+  
+  return NULL;
+}
+
+void *Virt::callbackLoop (){
+  while (pollEvent && 
+         virConnectIsAlive(conn)  == 1 &&
+         virEventRunDefaultImpl() == 0) {
+   
+    std::cout << "you have an event to read" << std::endl;
+    
+  }
+}
+
+int Virt::callbackEvent(virConnectPtr conn,
+                        virDomainPtr dom,
+                        int event,
+                        int detail,
+                        void * opaque){
+  std::cout 
+    << "EVENT " 
+    << virDomainGetName (dom) 
+    << " " 
+    << event 
+    << std::endl;
+}
 
 
 Return<void> Virt::setHost (Host *host, const virDomainPtr domainPtr) {
