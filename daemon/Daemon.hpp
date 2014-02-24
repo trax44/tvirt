@@ -20,6 +20,7 @@ private:
   tvirt::daemon::Virt virt;
   tvirt::comm::ServerZmq publisher;  
   tvirt::comm::ServerZmq replyer;  
+  std::string uuid;
 
   Return<void> execute(const proto::Request &request,
                        std::string *ret);

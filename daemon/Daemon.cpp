@@ -1,3 +1,5 @@
+#include <uuid.h>
+
 #include "Daemon.hpp"
 
 
@@ -14,6 +16,12 @@ Daemon::Daemon(const std::string &address,
   portRequest(portRequest),
   publisher(address, portPublisher, ZMQ_PUB),
   replyer(address, portRequest, ZMQ_REP){
+  
+  char t[37];
+  uuid_t uuidOut;
+  uuid_generate(uuidOut);
+  uuid_unparse(uuidOut, t);
+  uuid.insert(0, t);
 
   handlerRequest();
 }
