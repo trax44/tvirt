@@ -1,0 +1,9 @@
+* master 
+** web
+*** TODO remove hypervisor
+*** TODO test adding second hypervisor
+*** TODO Listen to publised event
+*** TODO Update hypervisor with published events
+
+** Daemon
+*** TODO publish callbacks from Virt 
