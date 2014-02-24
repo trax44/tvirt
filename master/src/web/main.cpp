@@ -11,17 +11,14 @@
 #include <Wt/WLayout>
 #include <Wt/WDialog>
 #include <Wt/WServer>
-#include <Wt/WMessageBox>
 #include <Wt/WBootstrapTheme>
 #include <Wt/WTable>
 #include <Wt/WText>
 #include <Wt/WNavigationBar>
 #include <Wt/WMenu>
 #include <Wt/WStackedWidget>
-
 #include "../Requester.hpp"
-#include "HypervisorConnect.hpp"
-#include "Hypervisor.hpp"
+#include "Hypervisors.hpp"
 #include "../ViewControler.hpp"
 
 namespace tvirt {
@@ -39,10 +36,8 @@ public:
 
 private:
   ViewControler controler;
-  
+  Wt::WStackedWidget *menuStack;  
   void request();
-  std::list<Requester> hypervisorsConnection;
-  HypervisorConnect *hypervisorConnection;
 
   Wt::WVBoxLayout *globalLayout;
 
@@ -52,9 +47,8 @@ private:
 
 
   Wt::WNavigationBar * createNavigationBar(Wt::WStackedWidget *stack, Wt::WContainerWidget *parent=0);
-  void addHypervisor(const std::string address, uint16_t port);
-  void removeHypervisorDialog();
-  void askForHypervisorConnection();
+  
+
 };
 
 Wt::WWidget* createNotification(const std::string & text){
@@ -71,7 +65,13 @@ Wt::WNavigationBar * WebGUI::createNavigationBar(Wt::WStackedWidget *stack, Wt::
 
   Wt::WMenu *leftMenu = new Wt::WMenu(stack, parent);
   leftMenu->addItem("Home", new Wt::WText ("Welcome home"));
-  leftMenu->addItem("Hypervisors", new Wt::WText("Managing hypervisor"))->triggered().connect(this, &WebGUI::askForHypervisorConnection);
+
+
+  auto hypervisors = new Hypervisors(controler, root());
+
+  leftMenu->addItem("Hypervisors", hypervisors);
+
+
 
   auto notification = new Wt::WText("trax Omar Giveranud o.givernaud@gmail.com");
   notification->setStyleClass("alert alert-info");
@@ -103,7 +103,7 @@ WebGUI::WebGUI(const Wt::WEnvironment& env)
 
   root()->setStyleClass("row-fluid");
   
-  auto menuStack  = new Wt::WStackedWidget(root()); 
+  menuStack  = new Wt::WStackedWidget(root()); 
   auto navBar     = createNavigationBar(menuStack, root());
   globalLayout->addWidget(navBar,0);
   globalLayout->addWidget(menuStack,0);
@@ -112,58 +112,8 @@ WebGUI::WebGUI(const Wt::WEnvironment& env)
 
 }
 
-void WebGUI::removeHypervisorDialog(){
-  std::cout << "hyp res " << hypervisorConnection->result() << std::endl;
 
-  //delete hypervisorConnection;
-  hypervisorConnection = NULL;
-}
 
-void WebGUI::askForHypervisorConnection(){
-  hypervisorConnection = new HypervisorConnect();
-  hypervisorConnection->res().connect(this, &WebGUI::addHypervisor);
-  hypervisorConnection->finished().connect(this, &WebGUI::removeHypervisorDialog);
-  
-}
-
-void WebGUI::handleGuestAction (const ViewControler::ConnectionID connectionID, 
-                                const uint64_t guestID, 
-                                const proto::Type action){
-
-  controler.doActionOnGuest(connectionID, guestID, action);
-}
-
-void WebGUI::addHypervisor(const std::string address, uint16_t port) {
-  std::cout << "checking hypervision connection information" << std::endl;
-  Return<ViewControler::ConnectionID> connection = controler.addConnection(address, port);
-  
-  if (connection.success) {
-    auto r = controler.connectToHypervisor(connection.data);
-    if (!r.success){
-      return;
-    }
-    
-    web::Hypervisor *hypervisor = new web::Hypervisor (connection.data, r.data);
-    hypervisor->action().connect(this, &WebGUI::handleGuestAction);
-    globalLayout->insertWidget(globalLayout->count() - 1, hypervisor, 0);
-    
-    
-  } else {
-    Wt::WMessageBox * notification = 
-      new Wt::WMessageBox("Fail", 
-                          "Fail to connect to hypervisor<br/> Retry?", 
-                          Wt::Critical, 
-                          Wt::Yes|Wt::No);
-
-    notification->buttonClicked().connect(std::bind([=] () {
-          if (notification->buttonResult() == Wt::Yes) {
-            askForHypervisorConnection();
-          }
-          delete notification;
-        }));
-    notification->show();
-  }
-}
 
 } // web
 

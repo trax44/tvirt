@@ -9,6 +9,9 @@ add_executable(
   web/main.cpp
   web/HypervisorConnect.cpp
   web/HypervisorConnect.hpp
+
+  web/Hypervisors.cpp
+  web/Hypervisors.hpp
   web/Hypervisor.hpp
   web/Hypervisor.cpp
   )
