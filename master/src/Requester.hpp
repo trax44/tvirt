@@ -27,7 +27,7 @@ public:
 
 
   Return<proto::Reply> executeCommand (const proto::Request &request,
-                                       std::string *replyBuffer);
+                                       std::string *replyBuffer) ;
   
   
 

@@ -27,15 +27,11 @@ Hypervisors::Hypervisors(ViewControler & _controler, Wt::WContainerWidget *paren
 void Hypervisors::addHypervisor(const std::string & address, const uint16_t port) {
   std::cout << "checking hypervision connection information" << std::endl;
 
-  Return<ViewControler::ConnectionID> connection = controler.addConnection(address, port);
+  Return<ViewControler::HypervisorConnection*> hypervisorModel = controler.addConnection(address, port);
   
-  if (connection.success) {
-    auto r = controler.connectToHypervisor(connection.data);
-    if (!r.success){
-      return;
-    }
+  if (hypervisorModel.success) {
     
-    web::Hypervisor *hypervisor = new web::Hypervisor (connection.data, r.data);
+    web::Hypervisor *hypervisor = new web::Hypervisor (hypervisorModel.data);
     hypervisor->action().connect(this, &Hypervisors::handleGuestAction);
     layout->addWidget(hypervisor);
 
@@ -65,11 +61,11 @@ void Hypervisors::removeHypervisorDialog(){
 }
 
 
-void Hypervisors::handleGuestAction (const ViewControler::ConnectionID connectionID, 
+void Hypervisors::handleGuestAction (const ViewControler::HypervisorID hypervisorID, 
                                 const uint64_t guestID, 
-                                const proto::Type action){
+                                const proto::RequestType action){
 
-  controler.doActionOnGuest(connectionID, guestID, action);
+  controler.doActionOnGuest(hypervisorID, guestID, action);
 }
 
 void Hypervisors::add(){

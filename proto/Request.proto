@@ -2,32 +2,32 @@ package tvirt.proto;
 
 
 
-enum Type {
+enum RequestType {
   DOMAIN_DESTROY      = 0;
   DOMAIN_REBOOT       = 1;
   DOMAIN_START        = 2;
   DOMAIN_LIST         = 3;
   DOMAIN_GET_STATE    = 4;
   DOMAIN_SEND_COMMAND = 5;
+  HAND_SHAKE          = 6;
 }
 
 
 message Request{
 
-  optional int64    requestID  = 1;
-  optional fixed64  domainID   = 2;
-  optional string   domainName = 3;
-
-  
-  required Type     type       = 4;
+  required RequestType type       = 1;
+  optional int64       requestID  = 2;
+  optional fixed64     domainID   = 3;
+  optional string      domainName = 4;
 
 }
 
 
 message Reply {
-  required bool   success    = 1;
-  required Type   type       = 2;
-  optional string reason     = 3;
-  optional int64  requestID  = 4;
+  required string        UUID       = 1;
+  required bool          success    = 2;
+  required RequestType   type       = 3;
+  optional string        reason     = 4;
+  optional int64         requestID  = 5;
 }
 

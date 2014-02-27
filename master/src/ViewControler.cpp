@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <stdexcept>
-
+#include <utility>
 namespace tvirt {
 
 namespace master {
@@ -11,107 +11,72 @@ namespace master {
 ViewControler::ViewControler() {}
 
 
-Return<ViewControler::ConnectionID> 
+Return<ViewControler::HypervisorConnection*> 
 ViewControler::addConnection (const std::string &address, 
                               uint16_t port) {
 
   
-  /// \TODO use find_if 
-  for (Connections::const_iterator 
-         i = hypervisorConnections.begin() , 
-         e = hypervisorConnections.end() ;
-       i != e ; ++i) {
-
-    if (i->port == port && i->address == address) {
-      std::cout << "This connection already exist" << std::endl;
-      return false;
-    }
-  }
-  
-  ConnectionID id;
 
   try {
-    
+    proto::Request requestHandShake;
+    std::string replyBuffer;
     Requester requester(address, port);
-    id = hypervisorConnections.size();
+
+    requestHandShake.set_type(proto::RequestType::DOMAIN_LIST);
+
+    Return<proto::Reply> reply = requester.executeCommand(requestHandShake, &replyBuffer);
     
-    HypervisorConnection t (hypervisorConnections.size(), address, port);
-    hypervisorConnections.push_back (t);
+    if (!reply.success) {
+      return false;
+    }
     
+    proto::Hypervisor hypervisor;
+    if (!reply.data.success() || !hypervisor.ParseFromString(replyBuffer)){
+      std::cerr << "Failed to parse received data" << std::endl;
+      return false;
+    }
+
+    HypervisorConnection *t = new HypervisorConnection (reply.data.uuid(), address, port, requester, hypervisor);
+    std::unique_ptr<HypervisorConnection> tt (t);
+    hypervisorConnections.insert(std::make_pair(std::string("plop"), t));
+
+    
+    return &t;
   } catch (const std::runtime_error& error) {
     std::cout << "failed to connect " <<  error.what() << std::endl;
     return false;
   }
 
-  return id;
 }
 
-Return<void> ViewControler::doActionOnGuest(const ConnectionID connectionID,
+Return<void> ViewControler::doActionOnGuest(      HypervisorConnection &hypervisor,
                                             const uint64_t guestID, 
-                                            const proto::Type actionType) {
-  auto r = getConnection(connectionID);
-  if (!r.success){
-    return false;
-  }
-  
+                                            const proto::RequestType actionType) {
   proto::Request request;
   std::string buffer;
   
   request.set_type(actionType);
   request.set_domainid(guestID);
-  Return <proto::Reply> reply = r.data->requester.executeCommand(request, &buffer);
+  Return <proto::Reply> reply = hypervisor.requester.executeCommand(request, &buffer);
   return (reply.success && reply.data.success());
 }
 
-
-Return<Hypervisor> ViewControler::connectToHypervisor(const ConnectionID connectionID){
-  auto r = getConnection(connectionID);
-  if (!r.success){
-    return false;
-  }
-
-  std::string buffer;
-  proto::Request request;
-
-  request.set_type(proto::Type::DOMAIN_LIST);
-  Return <proto::Reply> reply = r.data->requester.executeCommand(request, &buffer);
-
-  if (!reply.success){
-    return false;
-  }
-
-  Hypervisor hypervisor;
-  if (!reply.data.success() || !hypervisor.ParseFromString(buffer)){
-    std::cerr << "Failed to parse received data" << std::endl;
-    return false;
-  }
-
-  return hypervisor;
-}
-
-Return <ViewControler::HypervisorConnection *> 
-ViewControler::getConnection(const ConnectionID connectionID) {
-  auto it = std::find_if (hypervisorConnections.begin(), 
-                          hypervisorConnections.end(), 
-                          [connectionID](HypervisorConnection &i)->bool{
-                            return (connectionID == i.id);
-                          }
-                          );
-  
-  if (it != hypervisorConnections.end()) {
-    return &(*it);
-  } else {
-    return {false, NULL};
-  }
+Return<void> ViewControler::doActionOnGuest(const HypervisorID hypervisorID,
+                                            const uint64_t guestID, 
+                                            const proto::RequestType actionType) {
+  /// \TODO TBD
+  return false;
 }
 
 
 Return<void> ViewControler::removeConnection (const std::string &, 
-                                       uint16_t port) {
+                                              uint16_t port) {
+  /// \TODO TBD
   return false;
 }
 
-Return<void> ViewControler::removeConnection (const ConnectionID) {
+Return<void> ViewControler::removeConnection (const HypervisorID) {
+  /// \TODO TBD
   return false;
 }
 

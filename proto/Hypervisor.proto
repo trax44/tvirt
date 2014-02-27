@@ -1,4 +1,4 @@
-package tvirt;
+package tvirt.proto;
 
 message Address {
   required string address = 1;
@@ -47,10 +47,10 @@ message Hypervisor {
     UNKNOWN = 4;
   }
 
-  required Type type     = 1;
-  required Host host     = 2;  
+  required Type   type     = 1;
+  required Host   host     = 2;  
 
-  repeated Guest guests  = 3;
+  repeated Guest guests    = 3;
 }
 
 

@@ -41,9 +41,9 @@ private:
 
   Wt::WVBoxLayout *globalLayout;
 
-  void handleGuestAction (const ViewControler::ConnectionID connectionID, 
+  void handleGuestAction (const ViewControler::HypervisorID hypervisorID, 
                           const uint64_t guestID, 
-                          const proto::Type action);
+                          const proto::RequestType action);
 
 
   Wt::WNavigationBar * createNavigationBar(Wt::WStackedWidget *stack, Wt::WContainerWidget *parent=0);

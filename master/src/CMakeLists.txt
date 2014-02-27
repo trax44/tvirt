@@ -23,11 +23,11 @@ target_link_libraries (master-web commZmq proto ${WITTY_LIBRARIES})
 
 
 
-add_executable(
-  master-stdout 
-  stdout/main.cpp 
-  stdout/Print.cpp 
-  stdout/Print.hpp
-  )
-
-target_link_libraries (master-stdout commZmq proto)
+#add_executable(
+#  master-stdout 
+#  stdout/main.cpp 
+#  stdout/Print.cpp 
+#  stdout/Print.hpp
+#  )
+#
+#target_link_libraries (master-stdout commZmq proto)

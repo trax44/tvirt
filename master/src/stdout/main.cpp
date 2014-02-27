@@ -8,7 +8,7 @@
 
 #include "../../../proto/Hypervisor.pb.h"
 
-
+using namespace tvirt;
 
 Return<tvirt::proto::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
                                      const tvirt::proto::Request   &request,
@@ -42,7 +42,7 @@ Return<tvirt::proto::Reply> executeCommand (tvirt::comm::ClientZmq &requester,
   return Return<tvirt::proto::Reply>(true, replyHeader);
 }
 
-void printGuest (const tvirt::Guest &guest){
+void printGuest (const proto::Guest &guest){
     std::cout << "Guest: "
               << ((guest.active())?"ON  ":"OFF ")
               << guest.host().name() 
@@ -51,7 +51,7 @@ void printGuest (const tvirt::Guest &guest){
               << std::endl;
 }
 
-void printHypervisor(const tvirt::Hypervisor &hypervisor){
+void printHypervisor(const proto::Hypervisor &hypervisor){
 
   std::cout << "Hypervisor" << std::endl;
   std::cout << "type      " << hypervisor.type()        << std::endl;
@@ -64,7 +64,7 @@ void printHypervisor(const tvirt::Hypervisor &hypervisor){
 
 }
 
-void printCPU(const tvirt::CPU &cpu){
+void printCPU(const proto::CPU &cpu){
   std::cout << "CPU nb " 
             << cpu.nbcpu()
             << " " 
@@ -72,7 +72,7 @@ void printCPU(const tvirt::CPU &cpu){
             << std::endl;
 }
 
-void printMemory (const tvirt::Memory &memory){
+void printMemory (const proto::Memory &memory){
   std::cout << "Memory " 
             << memory.used() 
             << "/"
@@ -80,7 +80,7 @@ void printMemory (const tvirt::Memory &memory){
             << std::endl;
 }
 
-void printMonitoringState (const tvirt::MonitoringState &monitoringState) {
+void printMonitoringState (const proto::MonitoringState &monitoringState) {
   std::cout << "Monitoring state" << std::endl;
   printCPU (monitoringState.cpu());
  
@@ -98,7 +98,7 @@ void printBody (const tvirt::proto::Reply &reply,
     // nothing to do
     break;
   case tvirt::proto::DOMAIN_LIST:
-    {tvirt::Hypervisor hyper;
+    {proto::Hypervisor hyper;
     hyper.ParseFromString(buffer);
     printHypervisor(hyper);}
     break;

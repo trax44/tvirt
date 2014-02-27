@@ -87,7 +87,7 @@ int Virt::callbackEvent(virConnectPtr conn,
 }
 
 
-Return<void> Virt::setHost (Host *host, const virDomainPtr domainPtr) {
+Return<void> Virt::setHost (proto::Host *host, const virDomainPtr domainPtr) {
   virDomainInfo info;
   if (virDomainGetInfo(domainPtr, &info) == -1){
     return false;
@@ -104,14 +104,14 @@ Return<void> Virt::setHost (Host *host, const virDomainPtr domainPtr) {
 }
 
 
-void Virt::setGuest(Guest *guest, const virDomainPtr domainPtr) {
+void Virt::setGuest(proto::Guest *guest, const virDomainPtr domainPtr) {
   setHost (guest->mutable_host(), domainPtr);
   
   guest->set_id(reinterpret_cast<uint64_t>(domainPtr));
   guest->set_active(((virDomainIsActive(domainPtr) == 1)?true:false));
 }
 
-Return<void> Virt::getListAllDomains(Hypervisor &hypervisor) {
+Return<void> Virt::getListAllDomains(proto::Hypervisor &hypervisor) {
   virDomainPtr *domainList;
 
     int n = virConnectListAllDomains(conn, 
@@ -122,7 +122,7 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor) {
     std::vector<unsigned char> tmp (VIR_UUID_BUFLEN);
     
     for (int i = 0 ; i < n ; ++i){
-        Guest* guest = hypervisor.add_guests();
+      proto::Guest* guest = hypervisor.add_guests();
         setGuest(guest, domainList[i]);
     }
 
@@ -138,11 +138,11 @@ Return<void> Virt::getListAllDomains(Hypervisor &hypervisor) {
 // PUBLIC ======================================================================
 
 
-const Return<const tvirt::MonitoringState &> 
+const Return<const proto::MonitoringState &> 
 Virt::getMonitoringState (const DomainID id) {
   virDomainInfo info;
   if (virDomainGetInfo(reinterpret_cast<virDomainPtr>(id), &info) == -1){
-    return Return<const tvirt::MonitoringState &>(false, monitoringState);
+    return Return<const proto::MonitoringState &>(false, monitoringState);
   }
   
   monitoringState.set_guestid(reinterpret_cast<uint64_t>(id));
@@ -157,14 +157,14 @@ Virt::getMonitoringState (const DomainID id) {
 }
 
 
-const Return<const tvirt::Hypervisor &> Virt::getHypervisor() {
+const Return<const proto::Hypervisor &> Virt::getHypervisor() {
   hypervisor.Clear();
-  hypervisor.set_type(Hypervisor_Type_UNKNOWN);
+  hypervisor.set_type(proto::Hypervisor_Type_UNKNOWN);
   hypervisor.mutable_host()->set_name(virConnectGetHostname(conn));
   
   Return <void> r = getListAllDomains (hypervisor);
   if (!r.success) {
-    return Return<const tvirt::Hypervisor &>(false, hypervisor);
+    return Return<const proto::Hypervisor &>(false, hypervisor);
   }
 
   return hypervisor;

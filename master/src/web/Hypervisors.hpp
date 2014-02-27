@@ -23,13 +23,13 @@ private:
   HypervisorConnect *hypervisorConnection;
 
   Wt::WVBoxLayout *layout;
-  std::unordered_map<ViewControler::ConnectionID, Hypervisor*> hypervisors;
+  std::unordered_map<ViewControler::HypervisorID, Hypervisor*> hypervisors;
 
   void addHypervisor(const std::string &address, const uint16_t port);
   void removeHypervisorDialog();
-  void handleGuestAction (const ViewControler::ConnectionID connectionID, 
+  void handleGuestAction (const ViewControler::HypervisorID connectionID, 
                           const uint64_t guestID, 
-                          const proto::Type action);
+                          const proto::RequestType action);
 public:
   Hypervisors(ViewControler & _controler, Wt::WContainerWidget *parent = 0);
 

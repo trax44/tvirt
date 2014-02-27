@@ -44,7 +44,7 @@ Return<void> Daemon::execute(const proto::Request & request,
     ret =  virt.destroyDomain(reinterpret_cast<virDomainPtr>(request.domainid()));
     serializedAnswer->clear();
     break;
-
+    
   case proto::DOMAIN_REBOOT:
     if (!request.has_domainid()){
       return false;
@@ -64,7 +64,7 @@ Return<void> Daemon::execute(const proto::Request & request,
 
   case proto::DOMAIN_LIST:
     {
-      const Return<const Hypervisor &>hypervisor = virt.getHypervisor();
+      const Return<const proto::Hypervisor &>hypervisor = virt.getHypervisor();
       if (hypervisor.success){
         hypervisor.data.SerializeToString(serializedAnswer);
         ret = true;
@@ -78,7 +78,7 @@ Return<void> Daemon::execute(const proto::Request & request,
       if (!request.has_domainid()){
         return false;
       }
-      const Return<const MonitoringState &> monitoringState = 
+      const Return<const proto::MonitoringState &> monitoringState = 
         virt.getMonitoringState(reinterpret_cast<virDomainPtr>(request.domainid()));
       if (!monitoringState.success) {
         return false;
@@ -88,6 +88,11 @@ Return<void> Daemon::execute(const proto::Request & request,
     }
     break;
 
+
+  case proto::HAND_SHAKE:
+    {
+      ret = true;
+    }
 
   default:
     std::cerr << "Unknow command " << request.type() << std::endl;
@@ -104,10 +109,11 @@ void Daemon::handlerRequest(){
   std::string replyHeaderBuffer;
 
   std::string replyBodyBuffer;
-
-
   std::string requestBuffer;
   proto::Request request;
+
+  replyHeader.set_uuid(uuid);
+
   while (ok) {
     requestBuffer.clear();
     Return<int> r = replyer.recv(&requestBuffer);

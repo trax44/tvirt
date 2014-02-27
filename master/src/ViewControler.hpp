@@ -4,7 +4,8 @@
 
 #include <stdint.h>
 #include <string>
-#include <list>
+#include <unordered_map>
+#include <memory>
 
 #include "Requester.hpp"
 #include "../../utils/Return.hpp"
@@ -15,51 +16,63 @@ namespace tvirt {
 
 namespace master {
 
+
+
 class ViewControler {
 public:
-  typedef uint16_t ConnectionID;
   typedef uint64_t GuestID;
-  
-private:
+  typedef std::string HypervisorID;
   enum ConnectionState{
     UP, DOWN
   };
 
   struct HypervisorConnection {
-    HypervisorConnection (const ConnectionID id,
+    HypervisorConnection (const std::string id,
                           const std::string address,
-                          const uint16_t port):
+                          const uint16_t port,
+                          const Requester requester,
+                          const proto::Hypervisor  hypervisor):
       id(id),
       address(address),
       port(port), 
-      requester(address, port){}
+      requester(requester),
+      hypervisor(hypervisor)
+    {}
 
     
-    const ConnectionID id;
+    const std::string  id;
     const std::string  address;
     const uint16_t     port;
     ConnectionState    state;
     Requester          requester;
+    proto::Hypervisor  hypervisor;
+    
   };
 
-  typedef std::list<HypervisorConnection> Connections;
+private:
+
+  /// \TODO should be a std::unique_ptr
+  typedef std::unordered_map<HypervisorID, HypervisorConnection* > Connections;
 
   Connections hypervisorConnections;
   
 public:
   ViewControler();
 
-  Return<ConnectionID> addConnection    (const std::string &, uint16_t port);
-  Return<void>         removeConnection (const std::string &, uint16_t port);
-  Return<void>         removeConnection (const ConnectionID);
+  Return<HypervisorConnection*>
+  addConnection    (const std::string &, uint16_t port);
 
-  Return <ViewControler::HypervisorConnection *> 
-  getConnection(const ConnectionID connectionID);
+  Return<void>         removeConnection (const std::string &, uint16_t port);
+  Return<void>         removeConnection (const HypervisorID);
+
+  Return<void>         doActionOnGuest(const HypervisorID connectionID,
+                                       const uint64_t guestID,
+                                       const proto::RequestType actionType);
   
-  Return<Hypervisor>         connectToHypervisor(const ConnectionID connectionID);
-  Return<void>               doActionOnGuest(const ConnectionID connectionID,
-                                             const uint64_t guestID,
-                                             const proto::Type actionType);
+  Return<void>         doActionOnGuest(      HypervisorConnection &hypervisor,
+                                       const uint64_t guestID, 
+                                       const proto::RequestType actionType);
+    
 };
 
 } // master

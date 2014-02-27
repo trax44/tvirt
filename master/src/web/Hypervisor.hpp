@@ -18,21 +18,20 @@ public:
 
 private:
 
-  const ViewControler::ConnectionID connectionID;
-  Wt::Signal<const ViewControler::ConnectionID, 
+  const ViewControler::HypervisorConnection *hypervisor;
+  Wt::Signal<const ViewControler::HypervisorID, 
              const uint64_t, 
-             const proto::Type> done_;
+             const proto::RequestType> done_;
 
   const std::string osName(int i);  
-  void emitAction (const ViewControler::ConnectionID,
+  void emitAction (const ViewControler::HypervisorID,
                    const uint64_t guestID, 
-                   const proto::Type action);
+                   const proto::RequestType action);
 public:
-  Hypervisor(const ViewControler::ConnectionID connectionID, 
-             const ::tvirt::Hypervisor &hypervisor);
-  Wt::Signal<const ViewControler::ConnectionID, 
+  Hypervisor(const ViewControler::HypervisorConnection *hypervisor);
+  Wt::Signal<const ViewControler::HypervisorID, 
              const uint64_t, 
-             const proto::Type>& action() { return done_; }
+             const proto::RequestType>& action() { return done_; }
 };
 
 } // web

@@ -22,11 +22,11 @@ private:
   pthread_t callBackThread;
   virConnectPtr conn; 
 
-  tvirt::Hypervisor         hypervisor;
-  tvirt::MonitoringState    monitoringState;
+  proto::Hypervisor         hypervisor;
+  proto::MonitoringState    monitoringState;
   static volatile bool      pollEvent;
 
-  Return<void> getListAllDomains (Hypervisor &hypervisor);
+  Return<void> getListAllDomains (proto::Hypervisor &hypervisor);
 
   static void *callbackLoopStatic(void *me);
   void        *callbackLoop      ();
@@ -40,19 +40,19 @@ public:
   // Return<List> getListInactiveVm();
   // Return<List> getListActiveVm();
   // Return<List> getListAllVm();
-  void                                 setGuest          (Guest *guest, 
+  void                                 setGuest          (proto::Guest *guest, 
                                                           const virDomainPtr domainPtr);
 
-  Return<void>                         setHost           (Host *host, 
+  Return<void>                         setHost           (proto::Host *host, 
                                                           const virDomainPtr domainPtr);
 
-  const Return<const Hypervisor&>      getHypervisor     ();
-  const Return<const MonitoringState&> getMonitoringState(const DomainID domainPtr);
-  const Return<void>                   start             (const DomainID domainPtr);
-  const Return<void>                   rebootDomain      (const DomainID domainPtr);
-  const Return<void>                   startDomain       (const DomainID domainPtr);
-  const Return<void>                   stopDomain        (const DomainID domainPtr);
-  const Return<void>                   destroyDomain     (const DomainID domainPtr);
+  const Return<const proto::Hypervisor&>      getHypervisor     ();
+  const Return<const proto::MonitoringState&> getMonitoringState(const DomainID domainPtr);
+  const Return<void>                          start             (const DomainID domainPtr);
+  const Return<void>                          rebootDomain      (const DomainID domainPtr);
+  const Return<void>                          startDomain       (const DomainID domainPtr);
+  const Return<void>                          stopDomain        (const DomainID domainPtr);
+  const Return<void>                          destroyDomain     (const DomainID domainPtr);
 };
 
     
