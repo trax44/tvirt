@@ -57,6 +57,8 @@ Virt::Virt() :
 
 }
 
+
+
 void *Virt::callbackLoopStatic (void *me){
   static_cast<Virt*>(me)->callbackLoop();
   
@@ -73,17 +75,46 @@ void *Virt::callbackLoop (){
   }
 }
 
+int Virt::callbackEventStatic(virConnectPtr conn,
+                              virDomainPtr dom,
+                              int event,
+                              int detail,
+                              void * opaque){
+  static_cast<Virt*>(opaque)->callbackEvent(conn, 
+                                            dom,
+                                            event,
+                                            detail);
+}
+                                            
 int Virt::callbackEvent(virConnectPtr conn,
                         virDomainPtr dom,
                         int event,
-                        int detail,
-                        void * opaque){
+                        int detail) {
+  
   std::cout 
     << "EVENT " 
     << virDomainGetName (dom) 
     << " " 
     << event 
     << std::endl;
+
+
+    for (MonitoringStateCallBacks::iterator 
+           it  = monitoringStateCallBacks.begin(),
+           end = monitoringStateCallBacks.end() ; 
+         it != end ; ++it){
+      
+      const Return<const proto::MonitoringState &> r = 
+        getMonitoringState(reinterpret_cast<DomainID>(dom));
+
+      if (r.success){
+        (*it)->monitoringStateEvent(r.data);
+      }
+
+    }
+
+
+
 }
 
 
@@ -123,7 +154,7 @@ Return<void> Virt::getListAllDomains(proto::Hypervisor &hypervisor) {
     
     for (int i = 0 ; i < n ; ++i){
       proto::Guest* guest = hypervisor.add_guests();
-        setGuest(guest, domainList[i]);
+      setGuest(guest, domainList[i]);
     }
 
     if (n > 0){

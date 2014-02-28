@@ -62,38 +62,35 @@ Return<void> Daemon::execute(const proto::Request & request,
     serializedAnswer->clear();
     break;
 
-  case proto::DOMAIN_LIST:
-    {
-      const Return<const proto::Hypervisor &>hypervisor = virt.getHypervisor();
-      if (hypervisor.success){
-        hypervisor.data.SerializeToString(serializedAnswer);
-        ret = true;
-      } else {
-        ret = false;
-      }
-    }
-    break;
-  case proto::DOMAIN_GET_STATE:
-    {
-      if (!request.has_domainid()){
-        return false;
-      }
-      const Return<const proto::MonitoringState &> monitoringState = 
-        virt.getMonitoringState(reinterpret_cast<virDomainPtr>(request.domainid()));
-      if (!monitoringState.success) {
-        return false;
-      }
-      monitoringState.data.SerializeToString(serializedAnswer);
+  case proto::DOMAIN_LIST: {
+    const Return<const proto::Hypervisor &>hypervisor = virt.getHypervisor();
+    if (hypervisor.success){
+      hypervisor.data.SerializeToString(serializedAnswer);
       ret = true;
+    } else {
+      ret = false;
     }
+  }
     break;
-
-
-  case proto::HAND_SHAKE:
-    {
-      ret = true;
+  case proto::DOMAIN_GET_STATE: {
+    if (!request.has_domainid()){
+      return false;
     }
+    const Return<const proto::MonitoringState &> monitoringState = 
+      virt.getMonitoringState(reinterpret_cast<virDomainPtr>(request.domainid()));
+    if (!monitoringState.success) {
+      return false;
+    }
+    monitoringState.data.SerializeToString(serializedAnswer);
+    ret = true;
+  }
+    break;
+    
 
+  case proto::HAND_SHAKE: {
+    ret = true;
+  }
+    
   default:
     std::cerr << "Unknow command " << request.type() << std::endl;
     ret = false;
@@ -158,7 +155,7 @@ void Daemon::handlerRequest(){
   }
 }
 
-
+void Daemon::monitoringStateEvent(const proto::MonitoringState &monitoringState){}
 
 } //Daemon
 
